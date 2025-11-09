@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<testsuite name="Chrome Headless 141.0.0.0 (Mac OS 10.15.7)" package="" timestamp="2025-10-24T14:02:09" id="0" hostname="MacBook-Pro-2.local" tests="4" errors="0" failures="0" time="0.038">
+  <properties>
+    <property name="browser.fullName" value="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.0.0 Safari/537.36"/>
+  </properties>
+  <testcase name="EmployeeService should retrieve all employees" time="0.006" classname="EmployeeService"/>
+  <testcase name="AppComponent should render title" time="0.014" classname="AppComponent"/>
+  <testcase name="EmployeeComponent should create" time="0.014" classname="EmployeeComponent"/>
+  <testcase name="AddemployeeComponent should create" time="0.004" classname="AddemployeeComponent"/>
+  <system-out>
+    <![CDATA[Chrome Headless 141.0.0.0 (Mac OS 10.15.7) LOG: 'Employee createdDate:', '2025-10-24T11:02:09'
+,Chrome Headless 141.0.0.0 (Mac OS 10.15.7) LOG: 'Expected formatted date:', '2025-10-24T11:02:09'
+,Chrome Headless 141.0.0.0 (Mac OS 10.15.7) LOG: 'Employee createdDate:', '2025-10-24T11:02:09'
+,Chrome Headless 141.0.0.0 (Mac OS 10.15.7) LOG: 'Expected formatted date:', '2025-10-24T11:02:09'
+
+]]>
+  </system-out>
+  <system-err/>
+</testsuite>

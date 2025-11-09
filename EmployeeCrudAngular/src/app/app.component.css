@@ -1,0 +1,31 @@
+/* Contenedor principal centrado */
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  position: relative;
+  padding: 20px 40px;
+  background: linear-gradient(135deg, var(--farm-green) 0%, var(--farm-dark-green) 100%);
+  color: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  margin-bottom: 30px;
+}
+
+h1::before {
+  content: "🐄";
+  font-size: 2rem;
+  margin-right: 15px;
+}
+
+h1::after {
+  content: "🐷";
+  font-size: 2rem;
+  margin-left: 15px;
+}

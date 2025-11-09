@@ -1,0 +1,128 @@
+/* Contenedor centrado */
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 50vh;
+  padding: 20px;
+}
+
+/* Contenedor del formulario */
+div.m-2 {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  border: 3px solid var(--farm-brown);
+  max-width: 500px;
+  margin: 0 auto !important;
+}
+
+/* Título */
+.h5 {
+  color: var(--farm-brown);
+  font-weight: bold;
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 30px !important;
+}
+
+.h5::before {
+  content: "🐮 ";
+  font-size: 2rem;
+}
+
+/* Formulario */
+.form-group {
+  margin-bottom: 25px;
+  max-width: 100% !important;
+}
+
+.form-group label {
+  color: var(--farm-dark-green);
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.form-control {
+  border: 2px solid var(--farm-green);
+  border-radius: 10px;
+  padding: 12px 15px;
+  font-size: 1rem;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--farm-dark-green);
+  box-shadow: 0 0 8px rgba(107, 142, 35, 0.4);
+}
+
+.form-control::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+/* Botón */
+.btn-primary {
+  background: linear-gradient(135deg, var(--farm-green) 0%, var(--farm-dark-green) 100%) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 12px 25px !important;
+  font-weight: bold !important;
+  font-size: 1rem !important;
+  width: auto !important;
+  min-width: 120px !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3) !important;
+}
+
+.btn-primary::before {
+  content: "✓ ";
+  font-size: 1.2rem;
+}
+
+/* Texto de ayuda */
+.form-text {
+  font-size: 0.875rem;
+  margin-top: 5px;
+  color: #6c757d;
+}
+
+/* Alert de error */
+.alert {
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  animation: slideIn 0.3s ease;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  border: 2px solid #dc3545;
+  color: #721c24;
+}
+
+.alert-danger i {
+  margin-right: 8px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

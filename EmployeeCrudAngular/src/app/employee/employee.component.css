@@ -1,0 +1,226 @@
+/* Contenedor principal */
+:host {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.w-50 {
+  width: 100% !important;
+  max-width: 1000px;
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  border: 3px solid var(--farm-brown);
+}
+
+/* Estilo de la tabla de búsqueda */
+.w-100 {
+  margin-bottom: 20px;
+}
+
+.h5 {
+  color: var(--farm-brown);
+  font-weight: bold;
+  font-size: 1.8rem;
+}
+
+  /* Contenedor de tabla con scroll */
+  .table-wrapper {
+    max-height: 340px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 10px;
+    position: relative;
+  }
+
+  .table-wrapper::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  .table-wrapper::-webkit-scrollbar-thumb {
+    background: var(--farm-green);
+    border-radius: 10px;
+  }
+
+  .table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--farm-dark-green);
+  }
+
+/* Input de búsqueda */
+input[type="search"] {
+  border: 2px solid var(--farm-green);
+  border-radius: 10px;
+  padding: 10px 15px;
+  font-size: 1rem;
+}
+
+input[type="search"]:focus {
+  outline: none;
+  border-color: var(--farm-dark-green);
+  box-shadow: 0 0 5px rgba(107, 142, 35, 0.5);
+}
+
+/* Select de ordenamiento */
+.sort-select {
+  border: 2px solid var(--farm-green);
+  border-radius: 10px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  background-color: white;
+  color: var(--farm-dark-green);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  height: auto;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--farm-dark-green);
+  box-shadow: 0 0 5px rgba(107, 142, 35, 0.5);
+}
+
+.sort-select:hover {
+  border-color: var(--farm-dark-green);
+  background-color: #f9f9f9;
+}
+
+.sort-select option {
+  padding: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Botón principal */
+.btn-primary {
+  background: linear-gradient(135deg, var(--farm-red) 0%, #a81127 100%) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 12px 25px !important;
+  font-weight: bold !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3) !important;
+}
+
+/* Tabla principal */
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  width: 100%;
+  table-layout: fixed;
+}
+
+.table thead tr.btn-primary {
+  background: linear-gradient(135deg, var(--farm-green) 0%, var(--farm-dark-green) 100%) !important;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.table thead tr.btn-primary th {
+  padding: 10px 8px;
+  border: none;
+  color: white;
+  font-weight: bold;
+  vertical-align: middle;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: linear-gradient(135deg, var(--farm-green) 0%, var(--farm-dark-green) 100%);
+}
+
+.table thead tr.btn-primary th:first-child {
+  border-top-left-radius: 10px;
+}
+
+.table thead tr.btn-primary th:last-child {
+  border-top-right-radius: 10px;
+}
+
+/* Filas de la tabla */
+.table tbody tr {
+  transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+  background-color: var(--farm-beige) !important;
+  transform: scale(1.01);
+}
+
+.table td {
+  padding: 12px 8px;
+  vertical-align: middle;
+  border-bottom: 1px solid #e0e0e0;
+  word-wrap: break-word;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+
+.table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+}
+
+.rowGrayBg {
+  background-color: #f9f9f9 !important;
+}
+
+/* Iconos */
+.fa-edit, .fa-trash {
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.fa-edit {
+  color: var(--farm-green);
+}
+
+.fa-edit:hover {
+  color: var(--farm-dark-green);
+  transform: scale(1.2);
+}
+
+.fa-trash {
+  color: var(--farm-red);
+}
+
+.fa-trash:hover {
+  color: #a81127;
+  transform: scale(1.2);
+}
+
+.fa-search {
+  color: var(--farm-green);
+  font-size: 1.3rem;
+}
+
+/* Animación del loading */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+img[src*="loading.gif"] {
+  animation: spin 1s linear infinite;
+}

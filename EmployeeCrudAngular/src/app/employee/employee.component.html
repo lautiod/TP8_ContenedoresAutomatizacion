@@ -1,0 +1,64 @@
+<style>
+    .rowGrayBg {
+        background-color: rgb(222, 226, 224);
+    }
+</style>
+
+<div class="w-50">
+    <table class="w-100">
+        <tr>
+            <td>
+                <p class="h5 float-left pt-2">Animals:</p>
+            </td>
+            <td>
+            <input #searchInput type="search" placeholder="🔍 Search animals..." class="form-control" (input)="searchItem(searchInput.value)">           
+            </td>
+            <td class="pl-1">
+                <a href="javascript:void(0)"><i class="fa fa-search"></i></a>
+            </td>
+            <td style="padding-left: 10px;">
+                <select class="form-control sort-select" [(ngModel)]="sortOption" (change)="onSortChange($event)">
+                    <option value="name-asc">🔤 A-Z</option>
+                    <option value="name-desc">🔤 Z-A</option>
+                    <option value="date-asc">📅 Oldest First</option>
+                    <option value="date-desc">📅 Newest First</option>
+                </select>
+            </td>
+            <td><button type="button" class="btn btn-primary float-right" (click)="addEmployee()">Add New Animal</button></td>
+        </tr>
+    </table>
+
+        <div class="table-wrapper">
+            <table class="table">
+        <colgroup>
+            <col style="width: 8%;">
+            <col style="width: 25%;">
+            <col style="width: 47%;">
+            <col style="width: 10%;">
+            <col style="width: 10%;">
+        </colgroup>
+        <thead>
+            <tr class="btn-primary">
+                <th>Id</th>
+                <th>Name</th>
+                <th>Created Date</th>
+                <th style="text-align: center;">Edit</th>
+                <th style="text-align: center;">Delete<img src="assets/images/loading.gif" [style.display]="imgLoadingDisplay"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let employee of employees | async; let odd=odd;" [class.rowGrayBg]="odd">
+                <td>{{employee.id}}</td>
+                <td>{{employee.name}}</td>
+                <td>{{employee.createdDate}}</td>
+                <td style="text-align: center;">
+                    <a href="javascript:void(0)" (click)="editEmployee(employee.id)"><i class="fa fa-edit"></i></a>
+                </td>
+                <td style="text-align: center;">
+                    <a href="#" (click)="deleteEmployee(employee.id)"><i class="fa fa-trash"></i></a>
+                </td>
+            </tr>
+        </tbody>
+            </table>
+        </div>
+</div>

@@ -1,0 +1,21 @@
+<p class="h5 m-2">Create new animal:</p>
+<div class="m-2">
+<form novalidate (ngSubmit)="addEmployee(newEmployee)">
+    <div class="form-group" style="max-width: 400px;">
+    <label>Animal Name</label>
+    <input class="form-control"
+    name="name"
+    [(ngModel)]="newEmployee.name"
+    placeholder="e.g. Cow, Pig, Chicken..."
+    maxlength="100"
+    />
+    <small class="form-text text-muted">
+      {{newEmployee.name?.length || 0}}/100 characters (minimum 2)
+    </small>
+    </div>
+    <button class="btn btn-primary" type="submit" style="min-width: 100px;">
+    {{submitBtnText}}
+    <img src="assets/images/loading.gif" [style.display]="imgLoadingDisplay">
+    </button>
+    </form>
+   </div>
