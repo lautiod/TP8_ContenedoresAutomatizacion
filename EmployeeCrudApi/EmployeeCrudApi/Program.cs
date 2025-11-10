@@ -2,44 +2,43 @@ using EmployeeCrudApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Console.WriteLine($"🔍 Environment: {builder.Environment.EnvironmentName}");
+Console.WriteLine($"🔍 IsDevelopment: {builder.Environment.IsDevelopment()}");
+
 // Add services to the container.
 builder.Services.AddCors(o => o.AddPolicy("MyPolicy", policyBuilder =>
 {
-    // En producción y QA, deberías restringir los orígenes permitidos
-    if (builder.Environment.IsDevelopment())
+    // Obtener los orígenes permitidos desde la configuración
+    var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+    
+    // Si no hay configuración de array, intentar obtener una variable de entorno simple
+    if (allowedOrigins == null || allowedOrigins.Length == 0)
     {
-        policyBuilder.AllowAnyOrigin()
-                     .AllowAnyMethod()
-                     .AllowAnyHeader();
+        var singleOrigin = builder.Configuration["AllowedOrigins"];
+        if (!string.IsNullOrEmpty(singleOrigin))
+        {
+            allowedOrigins = singleOrigin.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        }
     }
-    else
+    
+    Console.WriteLine($"🔍 CORS AllowedOrigins: {(allowedOrigins != null ? string.Join(", ", allowedOrigins) : "NULL")}");
+    
+    if (allowedOrigins != null && allowedOrigins.Length > 0)
     {
-        // Obtener los orígenes permitidos desde la configuración
-        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
-        
-        // Si no hay configuración de array, intentar obtener una variable de entorno simple
-        if (allowedOrigins == null || allowedOrigins.Length == 0)
-        {
-            var singleOrigin = builder.Configuration["AllowedOrigins"];
-            if (!string.IsNullOrEmpty(singleOrigin))
-            {
-                allowedOrigins = singleOrigin.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            }
-        }
-        
-        allowedOrigins = allowedOrigins ?? new[] { "*" };
-        
-        Console.WriteLine($"🔍 CORS AllowedOrigins count: {allowedOrigins.Length}");
-        foreach (var origin in allowedOrigins)
-        {
-            Console.WriteLine($"  - {origin}");
-        }
-        
+        // Configuración específica con orígenes permitidos
         policyBuilder.WithOrigins(allowedOrigins)
                      .AllowAnyMethod()
                      .AllowAnyHeader()
                      .AllowCredentials()
-                     .SetPreflightMaxAge(TimeSpan.FromMinutes(10)); // Cache preflight for 10 min
+                     .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
+    }
+    else
+    {
+        // Fallback: permitir cualquier origen (solo para desarrollo)
+        Console.WriteLine("⚠️ WARNING: Using AllowAnyOrigin");
+        policyBuilder.AllowAnyOrigin()
+                     .AllowAnyMethod()
+                     .AllowAnyHeader();
     }
 }));
 
