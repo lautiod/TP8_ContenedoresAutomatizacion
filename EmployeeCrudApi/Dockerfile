@@ -3,12 +3,12 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copio solo los csproj para aprovechar cache
-COPY EmployeeCrudApi/EmployeeCrudApi/*.csproj EmployeeCrudApi/
-RUN dotnet restore EmployeeCrudApi/EmployeeCrudApi.csproj
+COPY EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj EmployeeCrudApi/EmployeeCrudApi/
+RUN dotnet restore EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj
 
 # Copio el resto del código y compilo
-COPY EmployeeCrudApi/EmployeeCrudApi/ EmployeeCrudApi/
-RUN dotnet publish EmployeeCrudApi/EmployeeCrudApi.csproj -c Release -o /app/publish /p:UseAppHost=false
+COPY EmployeeCrudApi/ EmployeeCrudApi/
+RUN dotnet publish EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 # ===== Runtime =====
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
@@ -23,3 +23,4 @@ ENV TZ=Etc/UTC
 
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "EmployeeCrudApi.dll"]
+
