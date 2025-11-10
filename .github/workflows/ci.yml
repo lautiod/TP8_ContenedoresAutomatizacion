@@ -152,7 +152,7 @@ jobs:
 
   deploy_prod:
     name: Deploy to Production
-    needs: [build_push_prod, deploy_qa]
+    needs: [build_push_prod]
     runs-on: ubuntu-latest
     environment:
       name: production
