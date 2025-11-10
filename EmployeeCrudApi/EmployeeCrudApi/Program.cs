@@ -15,8 +15,19 @@ builder.Services.AddCors(o => o.AddPolicy("MyPolicy", policyBuilder =>
     else
     {
         // Obtener los orígenes permitidos desde la configuración
-        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
-                             ?? new[] { "*" };
+        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+        
+        // Si no hay configuración de array, intentar obtener una variable de entorno simple
+        if (allowedOrigins == null || allowedOrigins.Length == 0)
+        {
+            var singleOrigin = builder.Configuration["AllowedOrigins"];
+            if (!string.IsNullOrEmpty(singleOrigin))
+            {
+                allowedOrigins = singleOrigin.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            }
+        }
+        
+        allowedOrigins = allowedOrigins ?? new[] { "*" };
         
         Console.WriteLine($"🔍 CORS AllowedOrigins count: {allowedOrigins.Length}");
         foreach (var origin in allowedOrigins)
