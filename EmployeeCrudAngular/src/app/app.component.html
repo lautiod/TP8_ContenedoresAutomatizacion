@@ -1,2 +1,12 @@
+<!-- Badge de entorno -->
+<div class="env-badge">
+  <div class="badge-item env" [ngClass]="{'qa': envName === 'QA', 'prod': envName === 'PROD', 'dev': envName === 'DEV'}">
+    <strong>Entorno:</strong> {{ envName }}
+  </div>
+  <div class="badge-item db">
+    <strong>DB:</strong> {{ dbName }}
+  </div>
+</div>
+
 <h1>{{ title }}</h1>
 <router-outlet></router-outlet>
