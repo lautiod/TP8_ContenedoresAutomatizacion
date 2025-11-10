@@ -58,7 +58,8 @@ if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "QA")
 }
 
 // Recommended order
-app.UseHttpsRedirection();
+// No usar UseHttpsRedirection cuando está detrás de un proxy como Render
+// app.UseHttpsRedirection();
 app.UseRouting();
 // Ensure CORS runs between routing and endpoint execution
 app.UseCors("MyPolicy");
