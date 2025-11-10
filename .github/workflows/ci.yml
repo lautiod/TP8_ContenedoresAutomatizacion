@@ -34,13 +34,11 @@ jobs:
       - name: Build backend
         run: dotnet build EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj -c Release --no-restore
 
+      - name: Restore tests
+        run: dotnet restore EmployeeCrudApi.Tests/EmployeeCrudApi.Tests.csproj
+
       - name: Test backend
-        run: |
-          if ls **/*Tests.csproj 1> /dev/null 2>&1; then
-            dotnet test -c Release --no-build --verbosity normal
-          else
-            echo "No se encontraron proyectos de test .NET"
-          fi
+        run: dotnet test EmployeeCrudApi.Tests/EmployeeCrudApi.Tests.csproj -c Release --verbosity normal
 
       # ---------- Frontend (Angular) ----------
       - name: Setup Node
