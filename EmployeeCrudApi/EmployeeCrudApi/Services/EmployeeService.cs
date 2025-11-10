@@ -10,9 +10,17 @@ namespace EmployeeCrudApi.Services
 
         public EmployeeService(IConfiguration configuration)
         {
-            var mongoClient = new MongoClient(configuration.GetSection("MongoDB:ConnectionString").Value);
+            // Intentar obtener de ConnectionStrings primero, luego de MongoDB:ConnectionString
+            var connectionString = configuration.GetConnectionString("MongoDB") 
+                                   ?? configuration.GetSection("MongoDB:ConnectionString").Value;
+            
+            var mongoClient = new MongoClient(connectionString);
             var mongoDatabase = mongoClient.GetDatabase(configuration.GetSection("MongoDB:DatabaseName").Value);
             var collectionName = configuration.GetSection("MongoDB:CollectionName").Value;
+            
+            Console.WriteLine($"🔍 MongoDB ConnectionString: {(connectionString != null ? connectionString.Substring(0, Math.Min(30, connectionString.Length)) : "null")}...");
+            Console.WriteLine($"🔍 MongoDB DatabaseName: {configuration.GetSection("MongoDB:DatabaseName").Value}");
+            Console.WriteLine($"🔍 MongoDB CollectionName: {collectionName}");
             
             // Asegurarse de que la colección existe
             var collections = mongoDatabase.ListCollectionNames().ToList();
