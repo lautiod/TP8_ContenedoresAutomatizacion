@@ -11,8 +11,8 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_BACK: ${{ github.repository_owner }}/tp8-crud-api
-  IMAGE_FRONT: ${{ github.repository_owner }}/tp8-crud-angular
+  IMAGE_BACK: ${{ github.repository_owner }}/tp8-api
+  IMAGE_FRONT: ${{ github.repository_owner }}/tp8-angular
 
 jobs:
   tests_build:
