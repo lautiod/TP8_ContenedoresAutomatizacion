@@ -1,0 +1,10 @@
+bin
+obj
+*.user
+*.suo
+*.swp
+*.tmp
+.vscode
+.idea
+.git
+.gitignore
