@@ -29,10 +29,10 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore backend
-        run: dotnet restore EmployeeCrudApi/EmployeeCrudApi.csproj
+        run: dotnet restore EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj
 
       - name: Build backend
-        run: dotnet build EmployeeCrudApi/EmployeeCrudApi.csproj -c Release --no-restore
+        run: dotnet build EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj -c Release --no-restore
 
       - name: Test backend
         run: |
