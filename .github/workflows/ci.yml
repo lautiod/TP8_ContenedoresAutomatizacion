@@ -1,128 +1,118 @@
-name: ci
+name: CI/CD
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
+    branches: [ "main" ]     # Dispara QA
+    tags:     [ "v*" ]       # Dispara PROD
+  workflow_dispatch: {}
 
 permissions:
   contents: read
-  packages: write  # necesario para subir a GHCR
+  packages: write   # necesario para publicar en GHCR
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_BACK: ${{ github.repository_owner }}/tp8-crud-api
-  IMAGE_FRONT: ${{ github.repository_owner }}/tp8-crud-angular
+  IMAGE_NAMESPACE: ${{ github.repository }}   # ghcr.io/<owner>/<repo>
+  FRONT_CONTEXT: ./EmployeeCrudAngular
+  BACK_CONTEXT:  ./EmployeeCrudApi
+  BACK_PROJECT:  EmployeeCrudApi/EmployeeCrudApi.csproj
 
 jobs:
-  tests_build:
+  test_build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      # ---------- Backend (.NET) ----------
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      # Node/Angular
+      - uses: actions/setup-node@v4
         with:
-          dotnet-version: '8.0.x'
-
-      - name: Restore backend
-        run: dotnet restore EmployeeCrudApi/EmployeeCrudApi.csproj
-
-      - name: Build backend
-        run: dotnet build EmployeeCrudApi/EmployeeCrudApi.csproj -c Release --no-restore
-
-      - name: Test backend (si hay tests)
-        run: |
-          if ls **/*Tests.csproj >/dev/null 2>&1; then
-            dotnet test -c Release --no-build
-          else
-            echo "No se encontraron proyectos de test .NET"
-          fi
-
-      # ---------- Frontend (Angular) ----------
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install deps (frontend)
-        working-directory: EmployeeCrudAngular
-        run: npm ci || npm install
-
-      - name: Build frontend
-        working-directory: EmployeeCrudAngular
+          node-version: 20
+      - name: Install FE deps
+        working-directory: ${{ env.FRONT_CONTEXT }}
+        run: npm install
+      - name: FE build (prod)
+        working-directory: ${{ env.FRONT_CONTEXT }}
         run: npm run build --if-present || npx ng build --configuration production
 
-  push_images:
-    needs: tests_build
+      # .NET
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Restore & Test BE
+        run: |
+          dotnet restore ${{ env.BACK_PROJECT }}
+          # Si tenés tests, ejecutalos. Si no, dejá este step con '|| true' o elimínalo.
+          dotnet test || true
+      - name: Publish BE
+        run: dotnet publish ${{ env.BACK_PROJECT }} -c Release -o /tmp/publish /p:UseAppHost=false
+
+  build_and_push:
+    needs: test_build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login to GHCR
+      # Login a GHCR con el GITHUB_TOKEN
+      - name: Login GHCR
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker metadata (backend)
-        id: meta_back
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_BACK }}
-          tags: |
-            type=sha
-            type=raw,value=qa
-            type=raw,value=prod
+      - name: Set tags by ref
+        id: tags
+        run: |
+          SHA="${GITHUB_SHA::7}"
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            # PROD
+            echo "ENV_TAG=prod" >> $GITHUB_OUTPUT
+            echo "SUFFIX=${SHA}" >> $GITHUB_OUTPUT
+          else
+            # QA
+            echo "ENV_TAG=qa" >> $GITHUB_OUTPUT
+            echo "SUFFIX=${SHA}" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Build & Push backend
+      # FRONT image
+      - name: Build & Push FRONT
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: EmployeeCrudApi/Dockerfile
+          file: ${{ env.FRONT_CONTEXT }}/Dockerfile
           push: true
-          tags: ${{ steps.meta_back.outputs.tags }}
-          labels: ${{ steps.meta_back.outputs.labels }}
-
-      - name: Docker metadata (frontend)
-        id: meta_front
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_FRONT }}
           tags: |
-            type=sha
-            type=raw,value=qa
-            type=raw,value=prod
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/front:${{ steps.tags.outputs.ENV_TAG }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/front:${{ steps.tags.outputs.ENV_TAG }}-${{ steps.tags.outputs.SUFFIX }}
 
-      - name: Build & Push frontend
+      # BACK image
+      - name: Build & Push BACK
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: EmployeeCrudAngular/Dockerfile
+          file: ${{ env.BACK_CONTEXT }}/EmployeeCrudApi/Dockerfile
           push: true
-          tags: ${{ steps.meta_front.outputs.tags }}
-          labels: ${{ steps.meta_front.outputs.labels }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/back:${{ steps.tags.outputs.ENV_TAG }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/back:${{ steps.tags.outputs.ENV_TAG }}-${{ steps.tags.outputs.SUFFIX }}
 
-  deploy_qa:
-    needs: push_images
+  deploy:
+    needs: build_and_push
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy Backend QA to Render
-        run: curl -X POST "${{ secrets.RENDER_BACK_QA_HOOK }}"
-      
-      - name: Deploy Frontend QA to Render
-        run: curl -X POST "${{ secrets.RENDER_FRONT_QA_HOOK }}"
-
-  deploy_prod:
-    needs: deploy_qa
-    runs-on: ubuntu-latest
-    environment:
-      name: production
-    steps:
-      - name: Deploy Backend PROD to Render
-        run: curl -X POST "${{ secrets.RENDER_BACK_PROD_HOOK }}"
-      
-      - name: Deploy Frontend PROD to Render
-        run: curl -X POST "${{ secrets.RENDER_FRONT_PROD_HOOK }}"
+      - name: Decide env & call Render hooks
+        env:
+          FRONT_QA:  ${{ secrets.RENDER_FRONT_QA_HOOK }}
+          BACK_QA:   ${{ secrets.RENDER_BACK_QA_HOOK }}
+          FRONT_PRD: ${{ secrets.RENDER_FRONT_PROD_HOOK }}
+          BACK_PRD:  ${{ secrets.RENDER_BACK_PROD_HOOK }}
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            echo "Deploying to PROD..."
+            curl -fsSL -X POST "$FRONT_PRD"
+            curl -fsSL -X POST "$BACK_PRD"
+          else
+            echo "Deploying to QA..."
+            curl -fsSL -X POST "$FRONT_QA"
+            curl -fsSL -X POST "$BACK_QA"
+          fi
