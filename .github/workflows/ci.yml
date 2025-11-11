@@ -1,0 +1,224 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write  # necesario para subir a GHCR
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_BACK: ${{ github.repository_owner }}/tp8-api
+  IMAGE_FRONT: ${{ github.repository_owner }}/tp8-angular
+  SONAR_PROJECT_KEY: lautiod_TP8_ContenedoresAutomatizacion
+  SONAR_ORGANIZATION: lautiod
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for better analysis
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install SonarCloud scanner
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Restore backend
+        run: dotnet restore EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj
+
+      - name: Begin SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          dotnet sonarscanner begin \
+            /k:"${{ env.SONAR_PROJECT_KEY }}" \
+            /o:"${{ env.SONAR_ORGANIZATION }}" \
+            /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+
+      - name: Build backend
+        run: dotnet build EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj -c Release
+
+      - name: Run tests with coverage
+        run: dotnet test EmployeeCrudApi.Tests/EmployeeCrudApi.Tests.csproj -c Release --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+      - name: End SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+
+      - name: SonarCloud Quality Gate check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  tests_build:
+    name: Tests & Build Validation
+    needs: sonarcloud
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ---------- Backend (.NET) ----------
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore backend
+        run: dotnet restore EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj
+
+      - name: Build backend
+        run: dotnet build EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj -c Release --no-restore
+
+      - name: Restore tests
+        run: dotnet restore EmployeeCrudApi.Tests/EmployeeCrudApi.Tests.csproj
+
+      - name: Test backend
+        run: dotnet test EmployeeCrudApi.Tests/EmployeeCrudApi.Tests.csproj -c Release --verbosity normal
+
+      # ---------- Frontend (Angular) ----------
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies
+        working-directory: EmployeeCrudAngular
+        run: npm ci || npm install
+
+      - name: Build frontend (QA)
+        working-directory: EmployeeCrudAngular
+        run: npx ng build --configuration qa
+
+      - name: Build frontend (Production)
+        working-directory: EmployeeCrudAngular
+        run: npx ng build --configuration production
+
+  build_push_qa:
+    name: Build & Push QA Images
+    needs: tests_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push Backend QA
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: EmployeeCrudApi/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_BACK }}:qa
+          labels: |
+            org.opencontainers.image.source=${{ github.event.repository.html_url }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Build & Push Frontend QA
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: EmployeeCrudAngular/Dockerfile.qa
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_FRONT }}:qa
+          labels: |
+            org.opencontainers.image.source=${{ github.event.repository.html_url }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+  build_push_prod:
+    name: Build & Push Production Images
+    needs: tests_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push Backend PROD
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: EmployeeCrudApi/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_BACK }}:prod
+          labels: |
+            org.opencontainers.image.source=${{ github.event.repository.html_url }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Build & Push Frontend PROD
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: EmployeeCrudAngular/Dockerfile.prod
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_FRONT }}:prod
+          labels: |
+            org.opencontainers.image.source=${{ github.event.repository.html_url }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+  deploy_qa:
+    name: Deploy to QA
+    needs: build_push_qa
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Backend QA to Render
+        run: |
+          echo "Deploying backend to QA..."
+          curl -fsSL -X POST "${{ secrets.RENDER_BACK_QA_HOOK }}"
+      
+      - name: Deploy Frontend QA to Render
+        run: |
+          echo "Deploying frontend to QA..."
+          curl -fsSL -X POST "${{ secrets.RENDER_FRONT_QA_HOOK }}"
+      
+      - name: QA Deployment Complete
+        run: echo "✅ QA deployment triggered successfully"
+
+  deploy_prod:
+    name: Deploy to Production
+    needs: [build_push_prod]
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://tp8-front-prod.onrender.com
+    steps:
+      - name: Deploy Backend PROD to Render
+        run: |
+          echo "Deploying backend to Production..."
+          curl -fsSL -X POST "${{ secrets.RENDER_BACK_PROD_HOOK }}"
+      
+      - name: Deploy Frontend PROD to Render
+        run: |
+          echo "Deploying frontend to Production..."
+          curl -fsSL -X POST "${{ secrets.RENDER_FRONT_PROD_HOOK }}"
+      
+      - name: Production Deployment Complete
+        run: echo "✅ Production deployment triggered successfully"
+
