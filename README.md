@@ -41,5 +41,4 @@ El pipeline automatiza:
 
 ## 📚 Documentación
 
-- **[PIPELINE_GUIDE.md](PIPELINE_GUIDE.md)** - Guía completa del pipeline y configuración
 - **[Decisiones.md](Decisiones.md)** - Decisiones arquitectónicas y justificaciones técnicas
