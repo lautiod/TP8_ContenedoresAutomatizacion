@@ -13,10 +13,63 @@ env:
   REGISTRY: ghcr.io
   IMAGE_BACK: ${{ github.repository_owner }}/tp8-api
   IMAGE_FRONT: ${{ github.repository_owner }}/tp8-angular
+  SONAR_PROJECT_KEY: lautiod_TP8_ContenedoresAutomatizacion
+  SONAR_ORGANIZATION: lautiod
 
 jobs:
+  sonarcloud:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for better analysis
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install SonarCloud scanner
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Restore backend
+        run: dotnet restore EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj
+
+      - name: Begin SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          dotnet sonarscanner begin \
+            /k:"${{ env.SONAR_PROJECT_KEY }}" \
+            /o:"${{ env.SONAR_ORGANIZATION }}" \
+            /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
+            /d:sonar.exclusions="**/bin/**,**/obj/**,**/node_modules/**,**/dist/**" \
+            /d:sonar.coverage.exclusions="**/Program.cs,**/*.spec.ts"
+
+      - name: Build backend
+        run: dotnet build EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj -c Release
+
+      - name: Run tests with coverage
+        run: dotnet test EmployeeCrudApi.Tests/EmployeeCrudApi.Tests.csproj -c Release --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+      - name: End SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+
+      - name: SonarCloud Quality Gate check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
   tests_build:
     name: Tests & Build Validation
+    needs: sonarcloud
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
