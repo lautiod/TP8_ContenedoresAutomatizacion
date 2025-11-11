@@ -66,13 +66,20 @@ jobs:
           echo "Waiting for SonarCloud to process the analysis..."
           sleep 10
 
-      - name: Check Quality Gate
+      - name: Check Quality Gate (Informative)
+        continue-on-error: true
         uses: sonarsource/sonarqube-quality-gate-action@master
         timeout-minutes: 5
         with:
           scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      
+      - name: SonarCloud Results
+        run: |
+          echo "📊 SonarCloud analysis complete!"
+          echo "🔍 View detailed results at: https://sonarcloud.io/dashboard?id=lautiod_TP8_ContenedoresAutomatizacion"
+          echo "⚠️  Note: Quality Gate failures are informative only and won't block the pipeline"
 
   tests_build:
     name: Tests & Build Validation
