@@ -1,14 +1,59 @@
 # TP8 – Contenedores y Automatización (ISW3)
 
-Este repositorio contiene el desarrollo completo del **Trabajo Práctico Nº8** de la asignatura *Ingeniería de Software 3*, enfocado en la **containerización**, **automatización de despliegues** y **configuración de pipelines CI/CD**.
+[![CI/CD Pipeline](https://github.com/lautiod/TP8_ContenedoresAutomatizacion/actions/workflows/pipeline.yml/badge.svg)](https://github.com/lautiod/TP8_ContenedoresAutomatizacion/actions/workflows/pipeline.yml)
 
-Aquí se encuentra:
+**Integrantes:** Ojeda Dante (2218203) | Reyna Agustín (2202124) | Tricherri Santiago (2205721)
 
-- El **código fuente** del backend (.NET) y frontend (Angular)
-- Los **Dockerfiles** utilizados para generar las imágenes de cada servicio
-- El archivo **YAML del pipeline** de GitHub Actions encargado de:
-  - Ejecutar análisis de calidad y tests
-  - Construir y publicar imágenes en GHCR
-  - Desplegar automáticamente en los entornos **QA** y **PROD** en Render
+---
 
-El proyecto implementa un flujo completo de integración y despliegue continuo, permitiendo que cada cambio en el repositorio se valide, construya y distribuya de manera automatizada.
+## 📋 Descripción
+
+Trabajo Práctico Nº8 de *Ingeniería de Software 3* enfocado en **containerización**, **automatización de despliegues** y **pipelines CI/CD**.
+
+## 🏗️ Arquitectura
+
+- **Backend:** .NET 8 Web API
+- **Frontend:** Angular 
+- **Database:** MongoDB Atlas
+- **Registry:** GitHub Container Registry (GHCR)
+- **Hosting:** Render
+- **CI/CD:** GitHub Actions
+
+## 🚀 Ambientes
+
+| Ambiente | Frontend | Backend |
+|----------|----------|---------|
+| **QA** | [tp8-front-qa.onrender.com](https://tp8-front-qa.onrender.com) | [tp8-back-qa-18pa.onrender.com](https://tp8-back-qa-18pa.onrender.com) |
+| **PROD** | [tp8-front-prod.onrender.com](https://tp8-front-prod.onrender.com) | [tp8-back-prod.onrender.com](https://tp8-back-prod.onrender.com) |
+
+## 📦 Contenido del Repositorio
+
+```
+├── .github/workflows/
+│   └── pipeline.yml          # Pipeline CI/CD completo
+├── EmployeeCrudApi/          # Backend .NET
+│   ├── Dockerfile
+│   └── EmployeeCrudApi/
+├── EmployeeCrudAngular/      # Frontend Angular
+│   ├── Dockerfile.qa
+│   └── Dockerfile.prod
+├── PIPELINE_GUIDE.md         # Guía detallada del pipeline
+└── Decisiones.md             # Decisiones técnicas y arquitectónicas
+```
+
+## 🔄 Pipeline CI/CD
+
+El pipeline automatiza:
+
+1. **Análisis de Calidad** → SonarCloud (informativo)
+2. **Tests** → Backend (.NET) + Frontend (Angular)
+3. **Build & Push** → Imágenes Docker a GHCR (`:qa` y `:prod`)
+4. **Deploy QA** → Automático en cada push
+5. **Deploy PROD** → Requiere aprobación manual
+
+📖 Ver [PIPELINE_GUIDE.md](PIPELINE_GUIDE.md) para más detalles.
+
+## 📚 Documentación
+
+- **[PIPELINE_GUIDE.md](PIPELINE_GUIDE.md)** - Guía completa del pipeline y configuración
+- **[Decisiones.md](Decisiones.md)** - Decisiones arquitectónicas y justificaciones técnicas
