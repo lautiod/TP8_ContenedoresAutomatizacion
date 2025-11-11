@@ -87,12 +87,47 @@ En conjunto, estas decisiones permitieron un flujo claro, reproducible y seguro 
 ## 2. Implementación
 
 ### Container Registry
+- Evidencia del registry funcionando (capturas con imágenes y tags)
+<img width="1110" height="173" alt="image" src="https://github.com/user-attachments/assets/76f7bb37-2aeb-4477-98fc-b0c65ce09c9d" />
+
+<img width="913" height="266" alt="image" src="https://github.com/user-attachments/assets/22951871-f81a-4e3c-92e8-3963402aab21" />
+
+- Configuración de permisos: Ambos los concedimos como públicos para ahorrarnos problemas de configuracion y credenciales
+<img width="1281" height="266" alt="image" src="https://github.com/user-attachments/assets/82153bfd-0a46-4375-8ace-710d4b81c933" />
 
 ### Ambiente QA
 
+- Deploy de las web services en Render (qa)
+<img width="1446" height="122" alt="image" src="https://github.com/user-attachments/assets/e6694938-99a8-48ca-a272-5c9213c33436" />
+
+- Variables de entorno en Render de Back-QA. ( Homólogas para Back-PROD )
+<img width="1324" height="290" alt="image" src="https://github.com/user-attachments/assets/7f892a2f-cca6-4219-97db-8c19e71fbc26" />
+
+- Página web en front-prod
+<img width="1647" height="654" alt="image" src="https://github.com/user-attachments/assets/6c6db0f7-67d8-4f90-a949-803553c651e6" />
+
 ### Ambiente PROD
 
+- Deploy de las web services en Render (prod)
+<img width="1365" height="117" alt="image" src="https://github.com/user-attachments/assets/110128b0-0e71-498d-8251-73ea9bb433c6" />
+
+- Página web en front-prod
+<img width="1677" height="653" alt="image" src="https://github.com/user-attachments/assets/89a4e770-2da6-4959-992f-967cd28bf4c1" />
+
+### Secretos configurados
+<img width="1012" height="434" alt="image" src="https://github.com/user-attachments/assets/a339a7bf-aa01-470c-beef-a20e735ec3b5" />
+
 ### Pipeline CI/CD
+
+- Deploy a QA
+<img width="1345" height="240" alt="image" src="https://github.com/user-attachments/assets/343028c7-6200-45f7-aa36-a1808b9b1fbf" />
+
+- Deploy a PROD con aprobación manual
+<img width="1340" height="236" alt="image" src="https://github.com/user-attachments/assets/06fa7ae5-0a9c-40f9-9a62-890cc91b02db" />
+<img width="1570" height="493" alt="image" src="https://github.com/user-attachments/assets/97080032-a3f3-430b-9026-767645d0b647" />
+
+- Partes del pipeline
+<img width="381" height="243" alt="image" src="https://github.com/user-attachments/assets/40b69031-9caa-449d-bd38-2431741b0a29" />
 
 ## 3. Comparativa QA vs PROD, Servicios Elegidos y Análisis de Alternativas
 
