@@ -26,20 +26,6 @@ Trabajo Práctico Nº8 de *Ingeniería de Software 3* enfocado en **containeriza
 | **QA** | [tp8-front-qa.onrender.com](https://tp8-front-qa.onrender.com) | [tp8-back-qa-18pa.onrender.com](https://tp8-back-qa-18pa.onrender.com) |
 | **PROD** | [tp8-front-prod.onrender.com](https://tp8-front-prod.onrender.com) | [tp8-back-prod.onrender.com](https://tp8-back-prod.onrender.com) |
 
-## 📦 Contenido del Repositorio
-
-```
-├── .github/workflows/
-│   └── pipeline.yml          # Pipeline CI/CD completo
-├── EmployeeCrudApi/          # Backend .NET
-│   ├── Dockerfile
-│   └── EmployeeCrudApi/
-├── EmployeeCrudAngular/      # Frontend Angular
-│   ├── Dockerfile.qa
-│   └── Dockerfile.prod
-├── PIPELINE_GUIDE.md         # Guía detallada del pipeline
-└── Decisiones.md             # Decisiones técnicas y arquitectónicas
-```
 
 ## 🔄 Pipeline CI/CD
 
