@@ -59,7 +59,7 @@ namespace EmployeeCrudApi.Tests
         {
             // Arrange
             var mock = new Mock<IEmployeeService>();
-            mock.Setup(s => s.GetAsync("missing-id")).ReturnsAsync((Employee)null);
+            mock.Setup(s => s.GetAsync("missing-id")).ReturnsAsync((Employee?)null);
             var controller = new EmployeeController(mock.Object);
 
             // Act
@@ -109,7 +109,7 @@ namespace EmployeeCrudApi.Tests
         {
             // Arrange
             var mock = new Mock<IEmployeeService>();
-            mock.Setup(s => s.GetAsync("missing-id")).ReturnsAsync((Employee)null);
+            mock.Setup(s => s.GetAsync("missing-id")).ReturnsAsync((Employee?)null);
             var controller = new EmployeeController(mock.Object);
 
             var updated = new Employee { Id = "missing-id", Name = "Updated" };
@@ -142,7 +142,7 @@ namespace EmployeeCrudApi.Tests
         {
             // Arrange
             var mock = new Mock<IEmployeeService>();
-            mock.Setup(s => s.GetAsync("missing-id")).ReturnsAsync((Employee)null);
+            mock.Setup(s => s.GetAsync("missing-id")).ReturnsAsync((Employee?)null);
             var controller = new EmployeeController(mock.Object);
 
             // Act

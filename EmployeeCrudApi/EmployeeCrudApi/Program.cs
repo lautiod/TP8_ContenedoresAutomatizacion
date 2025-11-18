@@ -1,4 +1,5 @@
 using EmployeeCrudApi.Services;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,15 @@ builder.Services.AddCors(o => o.AddPolicy("MyPolicy", policyBuilder =>
                      .AllowAnyHeader();
     }
 }));
+
+// Registrar IMongoClient como singleton
+builder.Services.AddSingleton<IMongoClient>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var connectionString = configuration.GetConnectionString("MongoDB") 
+                           ?? configuration.GetSection("MongoDB:ConnectionString").Value;
+    return new MongoClient(connectionString);
+});
 
 builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
 builder.Services.AddControllers();
