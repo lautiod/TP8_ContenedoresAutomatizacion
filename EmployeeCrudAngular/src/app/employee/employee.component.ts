@@ -40,7 +40,7 @@ export class EmployeeComponent implements OnInit {
     this.router.navigate(['/addemployee']);
   }
 
-  deleteEmployee(id: number) {
+  deleteEmployee(id: string) {
     this.employeeService
       .deleteEmployeeById(id)
       .subscribe((result) =>
@@ -51,7 +51,7 @@ export class EmployeeComponent implements OnInit {
     this.imgLoadingDisplay = 'inline';
   }
 
-  editEmployee(id: number) {
+  editEmployee(id: string) {
     this.router.navigate(['/addemployee'], { queryParams: { id: id } });
   }
 

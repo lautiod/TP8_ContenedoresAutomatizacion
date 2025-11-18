@@ -61,7 +61,7 @@ describe('AddemployeeComponent', () => {
     });
 
     it('should show error when name is empty', () => {
-      const employee = new Employee(0, '', '');
+  const employee = new Employee('', '', '');
       component.addEmployee(employee);
 
       expect(toastrService.error).toHaveBeenCalledWith(
@@ -71,7 +71,7 @@ describe('AddemployeeComponent', () => {
     });
 
     it('should show error when name contains only spaces', () => {
-      const employee = new Employee(0, '   ', '');
+  const employee = new Employee('', '   ', '');
       component.addEmployee(employee);
 
       expect(toastrService.error).toHaveBeenCalledWith(
@@ -81,7 +81,7 @@ describe('AddemployeeComponent', () => {
     });
 
     it('should show error when name has less than 2 characters', () => {
-      const employee = new Employee(0, 'A', '');
+  const employee = new Employee('', 'A', '');
       component.addEmployee(employee);
 
       expect(toastrService.error).toHaveBeenCalledWith(
@@ -92,7 +92,7 @@ describe('AddemployeeComponent', () => {
 
     it('should show error when name exceeds 100 characters', () => {
       const longName = 'A'.repeat(101);
-      const employee = new Employee(0, longName, '');
+  const employee = new Employee('', longName, '');
       component.addEmployee(employee);
 
       expect(toastrService.error).toHaveBeenCalledWith(
@@ -103,12 +103,12 @@ describe('AddemployeeComponent', () => {
 
     it('should show error when name is duplicate', () => {
       const existingEmployees = [
-        new Employee(1, 'Cow Maria', '2025-10-24T10:00:00'),
-        new Employee(2, 'Pig Pedro', '2025-10-24T11:00:00')
+        new Employee('1', 'Cow Maria', '2025-10-24T10:00:00'),
+        new Employee('2', 'Pig Pedro', '2025-10-24T11:00:00')
       ];
       component.allEmployees = existingEmployees;
 
-      const employee = new Employee(0, 'Cow Maria', '');
+  const employee = new Employee('', 'Cow Maria', '');
       component.addEmployee(employee);
 
       expect(toastrService.error).toHaveBeenCalledWith(
@@ -119,11 +119,11 @@ describe('AddemployeeComponent', () => {
 
     it('should show error when name is duplicate (case insensitive)', () => {
       const existingEmployees = [
-        new Employee(1, 'Cow Maria', '2025-10-24T10:00:00')
+        new Employee('1', 'Cow Maria', '2025-10-24T10:00:00')
       ];
       component.allEmployees = existingEmployees;
 
-      const employee = new Employee(0, 'cow maria', '');
+  const employee = new Employee('', 'cow maria', '');
       component.addEmployee(employee);
 
       expect(toastrService.error).toHaveBeenCalledWith(
@@ -134,12 +134,12 @@ describe('AddemployeeComponent', () => {
 
     it('should allow duplicate name when editing the same employee', () => {
       const existingEmployees = [
-        new Employee(1, 'Cow Maria', '2025-10-24T10:00:00')
+        new Employee('1', 'Cow Maria', '2025-10-24T10:00:00')
       ];
       component.allEmployees = existingEmployees;
-      employeeService.updateEmployee.and.returnValue(of(new Employee(1, 'Cow Maria', '')));
+      employeeService.updateEmployee.and.returnValue(of(new Employee('1', 'Cow Maria', '')));
 
-      const employee = new Employee(1, 'Cow Maria', '');
+      const employee = new Employee('1', 'Cow Maria', '');
       component.addEmployee(employee);
 
       expect(toastrService.error).not.toHaveBeenCalled();
@@ -147,9 +147,9 @@ describe('AddemployeeComponent', () => {
     });
 
     it('should trim spaces from name before saving', () => {
-      employeeService.createEmployee.and.returnValue(of(new Employee(1, 'Cow Maria', '')));
+      employeeService.createEmployee.and.returnValue(of(new Employee('1', 'Cow Maria', '')));
 
-      const employee = new Employee(0, '  Cow Maria  ', '');
+  const employee = new Employee('', '  Cow Maria  ', '');
       component.addEmployee(employee);
 
       expect(employee.name).toBe('Cow Maria');
@@ -158,10 +158,10 @@ describe('AddemployeeComponent', () => {
 
     it('should create employee successfully with valid name', () => {
       employeeService.createEmployee.and.returnValue(
-        of(new Employee(1, 'Cow Maria', '2025-10-24T10:00:00'))
+        of(new Employee('1', 'Cow Maria', '2025-10-24T10:00:00'))
       );
 
-      const employee = new Employee(0, 'Cow Maria', '');
+  const employee = new Employee('', 'Cow Maria', '');
       component.addEmployee(employee);
 
       expect(toastrService.error).not.toHaveBeenCalled();
@@ -174,10 +174,10 @@ describe('AddemployeeComponent', () => {
 
     it('should update employee successfully with valid name', () => {
       employeeService.updateEmployee.and.returnValue(
-        of(new Employee(1, 'Cow Maria Updated', '2025-10-24T10:00:00'))
+        of(new Employee('1', 'Cow Maria Updated', '2025-10-24T10:00:00'))
       );
 
-      const employee = new Employee(1, 'Cow Maria Updated', '');
+      const employee = new Employee('1', 'Cow Maria Updated', '');
       component.addEmployee(employee);
 
       expect(toastrService.error).not.toHaveBeenCalled();
@@ -189,9 +189,9 @@ describe('AddemployeeComponent', () => {
     });
 
     it('should accept name with exactly 2 characters', () => {
-      employeeService.createEmployee.and.returnValue(of(new Employee(1, 'AB', '')));
+      employeeService.createEmployee.and.returnValue(of(new Employee('1', 'AB', '')));
 
-      const employee = new Employee(0, 'AB', '');
+  const employee = new Employee('', 'AB', '');
       component.addEmployee(employee);
 
       expect(toastrService.error).not.toHaveBeenCalled();
@@ -200,9 +200,9 @@ describe('AddemployeeComponent', () => {
 
     it('should accept name with exactly 100 characters', () => {
       const validName = 'A'.repeat(100);
-      employeeService.createEmployee.and.returnValue(of(new Employee(1, validName, '')));
+      employeeService.createEmployee.and.returnValue(of(new Employee('1', validName, '')));
 
-      const employee = new Employee(0, validName, '');
+  const employee = new Employee('', validName, '');
       component.addEmployee(employee);
 
       expect(toastrService.error).not.toHaveBeenCalled();

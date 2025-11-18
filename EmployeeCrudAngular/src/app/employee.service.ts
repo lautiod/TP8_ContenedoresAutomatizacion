@@ -49,7 +49,7 @@ export class EmployeeService {
   }
 
 
-  getEmployeeById(employeeId: number): Observable<Employee> {
+  getEmployeeById(employeeId: string): Observable<Employee> {
     return this.http.get<Employee>(
       this.apiUrlEmployee + '/getbyid/?id=' + employeeId
     );
@@ -79,7 +79,7 @@ export class EmployeeService {
     );
   }
 
-  deleteEmployeeById(employeeid: number) {
+  deleteEmployeeById(employeeid: string) {
     return this.http.delete(this.apiUrlEmployee + '/delete/?id=' + employeeid);
   }
 }

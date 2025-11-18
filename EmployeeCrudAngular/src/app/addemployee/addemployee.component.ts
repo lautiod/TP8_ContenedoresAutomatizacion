@@ -14,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./addemployee.component.css']
 })
 export class AddemployeeComponent implements OnInit {
-  newEmployee: Employee = new Employee(0, '', '');
+  newEmployee: Employee = new Employee('', '', '');
   submitBtnText: string = "Create";
   imgLoadingDisplay: string = 'none';
   errorMessage: string = '';
@@ -76,7 +76,7 @@ export class AddemployeeComponent implements OnInit {
     // Si todas las validaciones pasan, guardar el empleado
     employee.name = employee.name.trim(); // Limpiar espacios al inicio y final
 
-    if (employee.id == 0) {
+    if (employee.id == '' || employee.id == null) {
       employee.createdDate = new Date().toISOString();
       this.employeeService.createEmployee(employee).subscribe({
         next: (result) => {
@@ -104,7 +104,7 @@ export class AddemployeeComponent implements OnInit {
     this.imgLoadingDisplay = 'inline';
   }
 
-  editEmployee(employeeId: number) {
+  editEmployee(employeeId: string) {
     this.employeeService.getEmployeeById(employeeId).subscribe(res => {
       this.newEmployee.id = res.id;
       this.newEmployee.name = res.name
