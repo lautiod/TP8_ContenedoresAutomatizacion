@@ -56,32 +56,22 @@ jobs:
         run: npx ng test --no-watch --no-progress --browsers ChromeHeadless --code-coverage --karma-config karma.conf.js
 
       # ---------- SonarCloud Analysis ----------
-      - name: Install SonarCloud scanner
-        run: dotnet tool install --global dotnet-sonarscanner
-
-      - name: Begin SonarCloud analysis
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          dotnet sonarscanner begin \
-            /k:"${{ env.SONAR_PROJECT_KEY }}" \
-            /o:"${{ env.SONAR_ORGANIZATION }}" \
-            /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
-            /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
-            /d:sonar.javascript.lcov.reportPaths="**/lcov.info" \
-            /d:sonar.exclusions="**/bin/**,**/obj/**,**/node_modules/**,**/dist/**,**/*.spec.ts" \
-            /d:sonar.coverage.exclusions="**/Program.cs,**/*.spec.ts" \
-            /d:sonar.sources="Backend/Backend,Frontend/src" \
-            /d:sonar.tests="Backend.Tests,Frontend/src"
-
-      - name: Build backend
-        run: dotnet build Backend/Backend/EmployeeCrudApi.csproj -c Release
-
-      - name: End SonarCloud analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        with:
+          args: >
+            -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
+            -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
+            -Dsonar.sources=Backend/Backend,Frontend/src
+            -Dsonar.tests=Backend.Tests
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/*.spec.ts,**/bin/**,**/obj/**
+            -Dsonar.test.exclusions=**/*.spec.ts
+            -Dsonar.javascript.lcov.reportPaths=Frontend/coverage/**/lcov.info
+            -Dsonar.typescript.lcov.reportPaths=Frontend/coverage/**/lcov.info
+            -Dsonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
+            -Dsonar.coverage.exclusions=**/Program.cs,**/*.spec.ts
 
       - name: Wait for Quality Gate
         run: |
