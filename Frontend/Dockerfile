@@ -3,11 +3,11 @@ FROM node:20 AS build
 WORKDIR /app
 
 # Copio package* primero para aprovechar cache
-COPY EmployeeCrudAngular/package*.json ./
+COPY Frontend/package*.json ./
 RUN npm install
 
 # Copio el resto del código y build prod
-COPY EmployeeCrudAngular/ ./
+COPY Frontend/ ./
 # Si tu proyecto usa Angular CLI:
 RUN npm run build --if-present || npx ng build --configuration production
 
@@ -15,7 +15,7 @@ RUN npm run build --if-present || npx ng build --configuration production
 FROM nginx:alpine AS final
 
 # Quita el default y pone uno SPA-friendly (maneja rutas)
-COPY EmployeeCrudAngular/nginx.conf /etc/nginx/conf.d/default.conf
+COPY Frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copio el artefacto Angular (ajusta la carpeta si tu output difiere)
 # Normalmente dist/<nombre-app>/

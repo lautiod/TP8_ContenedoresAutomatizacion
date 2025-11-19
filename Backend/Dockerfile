@@ -3,12 +3,12 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copio solo los csproj para aprovechar cache
-COPY EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj EmployeeCrudApi/EmployeeCrudApi/
-RUN dotnet restore EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj
+COPY Backend/Backend/EmployeeCrudApi.csproj Backend/Backend/
+RUN dotnet restore Backend/Backend/EmployeeCrudApi.csproj
 
 # Copio el resto del código y compilo
-COPY EmployeeCrudApi/ EmployeeCrudApi/
-RUN dotnet publish EmployeeCrudApi/EmployeeCrudApi/EmployeeCrudApi.csproj -c Release -o /app/publish /p:UseAppHost=false
+COPY Backend/ Backend/
+RUN dotnet publish Backend/Backend/EmployeeCrudApi.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 # ===== Runtime =====
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
