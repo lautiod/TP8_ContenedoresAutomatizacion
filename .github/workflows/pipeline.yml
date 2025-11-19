@@ -26,16 +26,38 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for better analysis
 
+      # ---------- Backend Setup & Tests ----------
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      - name: Install SonarCloud scanner
-        run: dotnet tool install --global dotnet-sonarscanner
-
       - name: Restore backend
         run: dotnet restore Backend/Backend/EmployeeCrudApi.csproj
+
+      - name: Restore tests
+        run: dotnet restore Backend.Tests/EmployeeCrudApi.Tests.csproj
+
+      - name: Test backend with coverage
+        run: dotnet test Backend.Tests/EmployeeCrudApi.Tests.csproj -c Release --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+      # ---------- Frontend Setup & Tests ----------
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies
+        working-directory: Frontend
+        run: npm ci || npm install
+
+      - name: Test frontend with coverage
+        working-directory: Frontend
+        run: npx ng test --no-watch --no-progress --browsers ChromeHeadless --code-coverage --karma-config karma.conf.js
+
+      # ---------- SonarCloud Analysis ----------
+      - name: Install SonarCloud scanner
+        run: dotnet tool install --global dotnet-sonarscanner
 
       - name: Begin SonarCloud analysis
         env:
@@ -47,14 +69,14 @@ jobs:
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
-            /d:sonar.exclusions="**/bin/**,**/obj/**,**/node_modules/**,**/dist/**" \
-            /d:sonar.coverage.exclusions="**/Program.cs,**/*.spec.ts"
+            /d:sonar.javascript.lcov.reportPaths="**/lcov.info" \
+            /d:sonar.exclusions="**/bin/**,**/obj/**,**/node_modules/**,**/dist/**,**/*.spec.ts" \
+            /d:sonar.coverage.exclusions="**/Program.cs,**/*.spec.ts" \
+            /d:sonar.sources="Backend/Backend,Frontend/src" \
+            /d:sonar.tests="Backend.Tests,Frontend/src"
 
       - name: Build backend
         run: dotnet build Backend/Backend/EmployeeCrudApi.csproj -c Release
-
-      - name: Run tests with coverage
-        run: dotnet test Backend.Tests/EmployeeCrudApi.Tests.csproj -c Release --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: End SonarCloud analysis
         env:
@@ -81,15 +103,15 @@ jobs:
           echo "🔍 View detailed results at: https://sonarcloud.io/dashboard?id=lautiod_TP8_ContenedoresAutomatizacion"
           echo "⚠️  Note: Quality Gate failures are informative only and won't block the pipeline"
 
-  tests_build:
-    name: Tests & Build Validation
+  build:
+    name: Build Validation
     needs: sonarcloud
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ---------- Backend (.NET) ----------
+      # ---------- Backend Build ----------
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -101,13 +123,7 @@ jobs:
       - name: Build backend
         run: dotnet build Backend/Backend/EmployeeCrudApi.csproj -c Release --no-restore
 
-      - name: Restore tests
-        run: dotnet restore Backend.Tests/EmployeeCrudApi.Tests.csproj
-
-      - name: Test backend
-        run: dotnet test Backend.Tests/EmployeeCrudApi.Tests.csproj -c Release --verbosity normal
-
-      # ---------- Frontend (Angular) ----------
+      # ---------- Frontend Build ----------
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -116,11 +132,6 @@ jobs:
       - name: Install frontend dependencies
         working-directory: Frontend
         run: npm ci || npm install
-
-      - name: Test frontend
-        working-directory: Frontend
-        run: npx ng test --no-watch --no-progress --browsers ChromeHeadless --code-coverage --karma-config karma.conf.js
-
 
       - name: Build frontend (QA)
         working-directory: Frontend
@@ -132,7 +143,7 @@ jobs:
 
   build_push_qa:
     name: Build & Push QA Images
-    needs: tests_build
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -169,7 +180,7 @@ jobs:
 
   build_push_prod:
     name: Build & Push Production Images
-    needs: tests_build
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
