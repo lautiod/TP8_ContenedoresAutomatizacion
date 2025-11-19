@@ -39,7 +39,14 @@ jobs:
         run: dotnet restore Backend.Tests/EmployeeCrudApi.Tests.csproj
 
       - name: Test backend with coverage
-        run: dotnet test Backend.Tests/EmployeeCrudApi.Tests.csproj -c Release --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+        run: dotnet test Backend.Tests/EmployeeCrudApi.Tests.csproj -c Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+      - name: Publish Backend Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: '**/test-results.trx'
+          check_name: 'Backend Test Results'
 
       # ---------- Frontend Setup & Tests ----------
       - name: Setup Node
@@ -54,6 +61,13 @@ jobs:
       - name: Test frontend with coverage
         working-directory: Frontend
         run: npx ng test --no-watch --no-progress --browsers ChromeHeadless --code-coverage --karma-config karma.conf.js
+
+      - name: Publish Frontend Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: 'Frontend/test-results/test-results.xml'
+          check_name: 'Frontend Test Results'
 
       # ---------- SonarCloud Analysis ----------
       - name: SonarCloud Scan
@@ -92,6 +106,8 @@ jobs:
           echo "📊 SonarCloud analysis complete!"
           echo "🔍 View detailed results at: https://sonarcloud.io/dashboard?id=lautiod_TP8_ContenedoresAutomatizacion"
           echo "⚠️  Note: Quality Gate failures are informative only and won't block the pipeline"
+          echo "### 📊 SonarCloud Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "[View Full Report](https://sonarcloud.io/summary/overall?id=lautiod_TP8_ContenedoresAutomatizacion&branch=main)" >> $GITHUB_STEP_SUMMARY
 
   build:
     name: Build Validation
@@ -221,7 +237,10 @@ jobs:
           curl -fsSL -X POST "${{ secrets.RENDER_FRONT_QA_HOOK }}"
       
       - name: QA Deployment Complete
-        run: echo "✅ QA deployment triggered successfully"
+        run: |
+          echo "✅ QA deployment triggered successfully"
+          echo "### 🚀 QA Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "[View QA Frontend](https://tp8-front-qa.onrender.com/)" >> $GITHUB_STEP_SUMMARY
 
   deploy_prod:
     name: Deploy to Production
