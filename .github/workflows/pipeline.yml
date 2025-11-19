@@ -107,7 +107,7 @@ jobs:
           echo "📊 SonarCloud analysis complete!"
           echo "🔍 View detailed results at: https://sonarcloud.io/dashboard?id=lautiod_TP8_ContenedoresAutomatizacion"
           echo "⚠️  Note: Quality Gate failures are informative only and won't block the pipeline"
-          echo "### 📊 SonarCloud Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "### SonarCloud Analysis" >> $GITHUB_STEP_SUMMARY
           echo "[View Full Report](https://sonarcloud.io/summary/overall?id=lautiod_TP8_ContenedoresAutomatizacion&branch=main)" >> $GITHUB_STEP_SUMMARY
 
   build:
@@ -226,6 +226,9 @@ jobs:
     name: Deploy to QA
     needs: build_push_qa
     runs-on: ubuntu-latest
+    environment:
+      name: qa
+      url: https://tp8-front-qa.onrender.com
     steps:
       - name: Deploy Backend QA to Render
         run: |
