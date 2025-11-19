@@ -31,7 +31,7 @@ namespace EmployeeCrudApi.Tests
 
             // Assert
             Assert.Equal(2, result.Count);
-            Assert.Equal("Joh Doe", result[0].Name);
+            Assert.Equal("John Doe", result[0].Name);
             Assert.Equal("Jane Doe", result[1].Name);
         }
 
