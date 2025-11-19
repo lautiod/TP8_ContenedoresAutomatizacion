@@ -8,6 +8,7 @@ on:
 permissions:
   contents: read
   packages: write  # necesario para subir a GHCR
+  checks: write    # necesario para publicar test results
 
 env:
   REGISTRY: ghcr.io
