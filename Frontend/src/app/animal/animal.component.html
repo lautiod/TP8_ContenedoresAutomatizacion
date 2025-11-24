@@ -11,7 +11,7 @@
                 <p class="h5 float-left pt-2">Animals:</p>
             </td>
             <td>
-            <input #searchInput type="search" placeholder="🔍 Search animals..." class="form-control" (input)="searchItem(searchInput.value)">           
+                <input #searchInput type="search" placeholder="🔍 Search animals..." class="form-control" (input)="searchItem(searchInput.value)">           
             </td>
             <td class="pl-1">
                 <a href="javascript:void(0)"><i class="fa fa-search"></i></a>
@@ -24,7 +24,7 @@
                     <option value="date-desc">📅 Newest First</option>
                 </select>
             </td>
-            <td><button type="button" class="btn btn-primary float-right" (click)="addEmployee()">Add New Animal</button></td>
+            <td><button type="button" class="btn btn-primary float-right" (click)="addAnimal()">Add New Animal</button></td>
         </tr>
     </table>
 
@@ -47,15 +47,15 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let employee of employees | async; let odd=odd;" [class.rowGrayBg]="odd">
-                <td>{{employee.id}}</td>
-                <td>{{employee.name}}</td>
-                <td>{{employee.createdDate}}</td>
+                <tr *ngFor="let animal of animals | async; let odd=odd;" [class.rowGrayBg]="odd">
+                <td>{{animal.id}}</td>
+                <td>{{animal.name}}</td>
+                <td>{{animal.createdDate}}</td>
                 <td style="text-align: center;">
-                    <a href="javascript:void(0)" (click)="editEmployee(employee.id)"><i class="fa fa-edit"></i></a>
+                    <a href="javascript:void(0)" (click)="editAnimal(animal.id)"><i class="fa fa-edit"></i></a>
                 </td>
                 <td style="text-align: center;">
-                    <a href="#" (click)="deleteEmployee(employee.id)"><i class="fa fa-trash"></i></a>
+                    <a href="#" (click)="deleteAnimal(animal.id)"><i class="fa fa-trash"></i></a>
                 </td>
             </tr>
         </tbody>

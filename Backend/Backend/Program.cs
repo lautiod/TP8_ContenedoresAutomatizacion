@@ -1,4 +1,4 @@
-using EmployeeCrudApi.Services;
+using FarmCrudApi.Services;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,7 +52,7 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
     return new MongoClient(connectionString);
 });
 
-builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
+builder.Services.AddSingleton<IAnimalService, AnimalService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

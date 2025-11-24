@@ -2,26 +2,25 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, LOCALE_ID } from '@angular/core'; // Importar LOCALE_ID
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { EmployeeComponent } from './employee/employee.component';
+import { AnimalComponent } from './animal/animal.component';
 import { HttpClientModule } from '@angular/common/http';
 import { DatePipe } from '@angular/common'; // Importar DatePipe y registerLocaleData
 import { FormsModule } from "@angular/forms";
-import { AddemployeeComponent } from './addemployee/addemployee.component';
+import { AddanimalComponent } from './addanimal/addanimal.component';
 
 
 
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    EmployeeComponent,
-    AddemployeeComponent
-  ],
+  declarations: [],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    AppComponent,
+    AnimalComponent,
+    AddanimalComponent
   ],
   providers: [
     DatePipe

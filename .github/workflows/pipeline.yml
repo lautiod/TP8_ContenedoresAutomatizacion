@@ -34,13 +34,13 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore backend
-        run: dotnet restore Backend/Backend/EmployeeCrudApi.csproj
+        run: dotnet restore Backend/Backend/AnimalCrudApi.csproj
 
       - name: Restore tests
-        run: dotnet restore Backend.Tests/EmployeeCrudApi.Tests.csproj
+        run: dotnet restore Backend.Tests/AnimalCrudApi.Tests.csproj
 
       - name: Test backend with coverage
-        run: dotnet test Backend.Tests/EmployeeCrudApi.Tests.csproj -c Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+        run: dotnet test Backend.Tests/AnimalCrudApi.Tests.csproj -c Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: Publish Backend Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
@@ -125,10 +125,10 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore backend
-        run: dotnet restore Backend/Backend/EmployeeCrudApi.csproj
+        run: dotnet restore Backend/Backend/AnimalCrudApi.csproj
 
       - name: Build backend
-        run: dotnet build Backend/Backend/EmployeeCrudApi.csproj -c Release --no-restore
+        run: dotnet build Backend/Backend/AnimalCrudApi.csproj -c Release --no-restore
 
       # ---------- Frontend Build ----------
       - name: Setup Node

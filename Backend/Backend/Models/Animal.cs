@@ -1,9 +1,9 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace EmployeeCrudApi.Models
+namespace FarmCrudApi.Models
 {
-    public class Employee
+    public class Animal
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]

@@ -1,29 +1,29 @@
-using EmployeeCrudApi.Models;
-using EmployeeCrudApi.Services;
+using FarmCrudApi.Models;
+using FarmCrudApi.Services;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using Moq;
 using Xunit;
 
-namespace EmployeeCrudApi.Tests
+namespace FarmCrudApi.Tests
 {
-    public class EmployeeServiceUnitTests
+    public class AnimalServiceUnitTests
     {
         private readonly Mock<IMongoClient> _mockMongoClient;
         private readonly Mock<IMongoDatabase> _mockDatabase;
-        private readonly Mock<IMongoCollection<Employee>> _mockCollection;
+    private readonly Mock<IMongoCollection<Animal>> _mockCollection;
         private readonly Mock<IConfiguration> _mockConfiguration;
-        private readonly Mock<IAsyncCursor<Employee>> _mockCursor;
-        private readonly Mock<IMongoIndexManager<Employee>> _mockIndexManager;
+    private readonly Mock<IAsyncCursor<Animal>> _mockCursor;
+    private readonly Mock<IMongoIndexManager<Animal>> _mockIndexManager;
 
-        public EmployeeServiceUnitTests()
+    public AnimalServiceUnitTests()
         {
             _mockMongoClient = new Mock<IMongoClient>();
             _mockDatabase = new Mock<IMongoDatabase>();
-            _mockCollection = new Mock<IMongoCollection<Employee>>();
+            _mockCollection = new Mock<IMongoCollection<Animal>>();
             _mockConfiguration = new Mock<IConfiguration>();
-            _mockCursor = new Mock<IAsyncCursor<Employee>>();
-            _mockIndexManager = new Mock<IMongoIndexManager<Employee>>();
+            _mockCursor = new Mock<IAsyncCursor<Animal>>();
+            _mockIndexManager = new Mock<IMongoIndexManager<Animal>>();
 
             // Setup configuration
             var mockDbNameSection = new Mock<IConfigurationSection>();
@@ -49,12 +49,12 @@ namespace EmployeeCrudApi.Tests
 
             _mockDatabase.Setup(d => d.CreateCollection(It.IsAny<string>(), It.IsAny<CreateCollectionOptions>(), It.IsAny<CancellationToken>()));
             
-            _mockDatabase.Setup(d => d.GetCollection<Employee>(It.IsAny<string>(), It.IsAny<MongoCollectionSettings>()))
+            _mockDatabase.Setup(d => d.GetCollection<Animal>(It.IsAny<string>(), It.IsAny<MongoCollectionSettings>()))
                         .Returns(_mockCollection.Object);
 
             // Setup index manager
             _mockCollection.Setup(c => c.Indexes).Returns(_mockIndexManager.Object);
-            _mockIndexManager.Setup(i => i.CreateOne(It.IsAny<CreateIndexModel<Employee>>(), It.IsAny<CreateOneIndexOptions>(), It.IsAny<CancellationToken>()))
+            _mockIndexManager.Setup(i => i.CreateOne(It.IsAny<CreateIndexModel<Animal>>(), It.IsAny<CreateOneIndexOptions>(), It.IsAny<CancellationToken>()))
                             .Returns("indexName");
         }
 
@@ -62,10 +62,10 @@ namespace EmployeeCrudApi.Tests
         public async Task GetAsync_ReturnsAllEmployees()
         {
             // Arrange
-            var employees = new List<Employee>
+            var employees = new List<Animal>
             {
-                new Employee { Id = "1", Name = "John Doe", CreatedDate = DateTime.UtcNow },
-                new Employee { Id = "2", Name = "Jane Smith", CreatedDate = DateTime.UtcNow }
+                new Animal { Id = "1", Name = "John Doe", CreatedDate = DateTime.UtcNow },
+                new Animal { Id = "2", Name = "Jane Smith", CreatedDate = DateTime.UtcNow }
             };
 
             _mockCursor.SetupSequence(c => c.MoveNext(It.IsAny<CancellationToken>()))
@@ -77,12 +77,12 @@ namespace EmployeeCrudApi.Tests
             _mockCursor.Setup(c => c.Current).Returns(employees);
 
             _mockCollection.Setup(c => c.FindAsync(
-                It.IsAny<FilterDefinition<Employee>>(),
-                It.IsAny<FindOptions<Employee, Employee>>(),
+                It.IsAny<FilterDefinition<Animal>>(),
+                It.IsAny<FindOptions<Animal, Animal>>(),
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_mockCursor.Object);
 
-            var service = new EmployeeService(_mockMongoClient.Object, _mockConfiguration.Object);
+            var service = new AnimalService(_mockMongoClient.Object, _mockConfiguration.Object);
 
             // Act
             var result = await service.GetAsync();
@@ -98,18 +98,18 @@ namespace EmployeeCrudApi.Tests
         public async Task GetAsync_ReturnsEmptyList_WhenNoEmployees()
         {
             // Arrange
-            var emptyList = new List<Employee>();
+            var emptyList = new List<Animal>();
 
             _mockCursor.Setup(c => c.MoveNext(It.IsAny<CancellationToken>())).Returns(false);
             _mockCursor.Setup(c => c.Current).Returns(emptyList);
 
             _mockCollection.Setup(c => c.FindAsync(
-                It.IsAny<FilterDefinition<Employee>>(),
-                It.IsAny<FindOptions<Employee, Employee>>(),
+                It.IsAny<FilterDefinition<Animal>>(),
+                It.IsAny<FindOptions<Animal, Animal>>(),
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_mockCursor.Object);
 
-            var service = new EmployeeService(_mockMongoClient.Object, _mockConfiguration.Object);
+            var service = new AnimalService(_mockMongoClient.Object, _mockConfiguration.Object);
 
             // Act
             var result = await service.GetAsync();
@@ -123,7 +123,7 @@ namespace EmployeeCrudApi.Tests
         public async Task GetAsync_WithId_ReturnsEmployee()
         {
             // Arrange
-            var employee = new Employee { Id = "123", Name = "Test Employee", CreatedDate = DateTime.UtcNow };
+            var employee = new Animal { Id = "123", Name = "Test Animal", CreatedDate = DateTime.UtcNow };
 
             _mockCursor.SetupSequence(c => c.MoveNext(It.IsAny<CancellationToken>()))
                       .Returns(true)
@@ -131,15 +131,15 @@ namespace EmployeeCrudApi.Tests
             _mockCursor.SetupSequence(c => c.MoveNextAsync(It.IsAny<CancellationToken>()))
                       .ReturnsAsync(true)
                       .ReturnsAsync(false);
-            _mockCursor.Setup(c => c.Current).Returns(new List<Employee> { employee });
+            _mockCursor.Setup(c => c.Current).Returns(new List<Animal> { employee });
 
             _mockCollection.Setup(c => c.FindAsync(
-                It.IsAny<FilterDefinition<Employee>>(),
-                It.IsAny<FindOptions<Employee, Employee>>(),
+                It.IsAny<FilterDefinition<Animal>>(),
+                It.IsAny<FindOptions<Animal, Animal>>(),
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_mockCursor.Object);
 
-            var service = new EmployeeService(_mockMongoClient.Object, _mockConfiguration.Object);
+            var service = new AnimalService(_mockMongoClient.Object, _mockConfiguration.Object);
 
             // Act
             var result = await service.GetAsync("123");
@@ -147,7 +147,7 @@ namespace EmployeeCrudApi.Tests
             // Assert
             Assert.NotNull(result);
             Assert.Equal("123", result.Id);
-            Assert.Equal("Test Employee", result.Name);
+            Assert.Equal("Test Animal", result.Name);
         }
 
         [Fact]
@@ -155,15 +155,16 @@ namespace EmployeeCrudApi.Tests
         {
             // Arrange
             _mockCursor.Setup(c => c.MoveNext(It.IsAny<CancellationToken>())).Returns(false);
-            _mockCursor.Setup(c => c.Current).Returns(new List<Employee>());
+            _mockCursor.Setup(c => c.Current).Returns(new List<Animal>());
+
 
             _mockCollection.Setup(c => c.FindAsync(
-                It.IsAny<FilterDefinition<Employee>>(),
-                It.IsAny<FindOptions<Employee, Employee>>(),
+                It.IsAny<FilterDefinition<Animal>>(),
+                It.IsAny<FindOptions<Animal, Animal>>(),
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_mockCursor.Object);
 
-            var service = new EmployeeService(_mockMongoClient.Object, _mockConfiguration.Object);
+            var service = new AnimalService(_mockMongoClient.Object, _mockConfiguration.Object);
 
             // Act
             var result = await service.GetAsync("nonexistent");
@@ -176,16 +177,16 @@ namespace EmployeeCrudApi.Tests
         public async Task CreateAsync_SetsCreatedDateAndInsertsEmployee()
         {
             // Arrange
-            var employee = new Employee { Name = "New Employee" };
+            var employee = new Animal { Name = "New Animal" };
             var beforeCreate = DateTime.UtcNow;
 
             _mockCollection.Setup(c => c.InsertOneAsync(
-                It.IsAny<Employee>(),
+                It.IsAny<Animal>(),
                 It.IsAny<InsertOneOptions>(),
                 It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var service = new EmployeeService(_mockMongoClient.Object, _mockConfiguration.Object);
+            var service = new AnimalService(_mockMongoClient.Object, _mockConfiguration.Object);
 
             // Act
             await service.CreateAsync(employee);
@@ -196,7 +197,7 @@ namespace EmployeeCrudApi.Tests
             Assert.True(employee.CreatedDate >= beforeCreate && employee.CreatedDate <= afterCreate);
             
             _mockCollection.Verify(c => c.InsertOneAsync(
-                It.Is<Employee>(e => e.Name == "New Employee" && e.CreatedDate != default(DateTime)),
+                It.Is<Animal>(e => e.Name == "New Animal" && e.CreatedDate != default(DateTime)),
                 It.IsAny<InsertOneOptions>(),
                 It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -206,28 +207,29 @@ namespace EmployeeCrudApi.Tests
         {
             // Arrange
             var employeeId = "123";
-            var updatedEmployee = new Employee { Id = employeeId, Name = "Updated Name", CreatedDate = DateTime.UtcNow };
+            var updatedEmployee = new Animal { Id = employeeId, Name = "Updated Name", CreatedDate = DateTime.UtcNow };
 
             var mockReplaceResult = new Mock<ReplaceOneResult>();
             mockReplaceResult.Setup(r => r.IsAcknowledged).Returns(true);
             mockReplaceResult.Setup(r => r.ModifiedCount).Returns(1);
 
+
             _mockCollection.Setup(c => c.ReplaceOneAsync(
-                It.IsAny<FilterDefinition<Employee>>(),
-                It.IsAny<Employee>(),
+                It.IsAny<FilterDefinition<Animal>>(),
+                It.IsAny<Animal>(),
                 It.IsAny<ReplaceOptions>(),
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(mockReplaceResult.Object);
 
-            var service = new EmployeeService(_mockMongoClient.Object, _mockConfiguration.Object);
+            var service = new AnimalService(_mockMongoClient.Object, _mockConfiguration.Object);
 
             // Act
             await service.UpdateAsync(employeeId, updatedEmployee);
 
             // Assert
             _mockCollection.Verify(c => c.ReplaceOneAsync(
-                It.IsAny<FilterDefinition<Employee>>(),
-                It.Is<Employee>(e => e.Name == "Updated Name"),
+                It.IsAny<FilterDefinition<Animal>>(),
+                It.Is<Animal>(e => e.Name == "Updated Name"),
                 It.IsAny<ReplaceOptions>(),
                 It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -242,19 +244,20 @@ namespace EmployeeCrudApi.Tests
             mockDeleteResult.Setup(r => r.IsAcknowledged).Returns(true);
             mockDeleteResult.Setup(r => r.DeletedCount).Returns(1);
 
+
             _mockCollection.Setup(c => c.DeleteOneAsync(
-                It.IsAny<FilterDefinition<Employee>>(),
+                It.IsAny<FilterDefinition<Animal>>(),
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(mockDeleteResult.Object);
 
-            var service = new EmployeeService(_mockMongoClient.Object, _mockConfiguration.Object);
+            var service = new AnimalService(_mockMongoClient.Object, _mockConfiguration.Object);
 
             // Act
             await service.RemoveAsync(employeeId);
 
             // Assert
             _mockCollection.Verify(c => c.DeleteOneAsync(
-                It.IsAny<FilterDefinition<Employee>>(),
+                It.IsAny<FilterDefinition<Animal>>(),
                 It.IsAny<CancellationToken>()), Times.Once);
         }
     }
