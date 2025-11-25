@@ -1,5 +1,4 @@
-﻿/*
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using FarmCrudApi.Models;
 using System;
 using System.Collections.Generic;
@@ -17,4 +16,3 @@ namespace FarmCrudApi.Data
         }
     }
 }
-*/
