@@ -233,6 +233,9 @@ jobs:
       name: qa
       url: https://tp8-front-qa.onrender.com
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Deploy Backend QA to Render
         run: |
           echo "Deploying backend to QA..."
