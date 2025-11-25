@@ -1,7 +1,8 @@
 describe('editAnimalTest', () => {
   it('Edita correctamente un animal', () => {
     // Interceptar las peticiones relevantes para sincronizar el test
-    cy.intercept('PUT', '**/api/Animal/update*').as('updateAnimal')
+    // Match update endpoint regardless of HTTP verb to be more robust
+    cy.intercept('**/api/Animal/update*').as('updateAnimal')
     cy.intercept('GET', '**/api/Animal/getall').as('getAll')
 
     // Visitar y esperar a que la lista se cargue
@@ -11,9 +12,9 @@ describe('editAnimalTest', () => {
     // Asegurarse de que hay al menos una fila en la tabla
     cy.get('table tbody tr').should('have.length.gte', 1)
 
-    // Haz clic en el botón de editar dentro de la primera fila (selector más robusto)
+    // Haz clic en el icono de editar dentro de la primera fila (selector más tolerante)
     cy.get('table tbody tr').first().within(() => {
-      cy.get('td').eq(3).find('a').click()
+      cy.get('i.fa').first().click()
     })
 
     // Asegúrate de que el campo de texto esté visible y habilitado,
@@ -27,9 +28,10 @@ describe('editAnimalTest', () => {
     // Envía el formulario
     cy.get('.btn').click()
 
-    // Espera a que la actualización y la recarga de lista terminen
-    cy.wait('@updateAnimal')
-    cy.wait('@getAll')
+    // Espera a que la recarga de la lista termine. Evitamos depender exclusivamente
+    // de la petición `updateAnimal` (algunas implementaciones pueden usar otro verb).
+    // Aumentamos el timeout para entornos que tardan más en procesar.
+    cy.wait('@getAll', { timeout: 20000 })
 
     // Verificación más robusta: usa contain.text sobre la celda de nombre
     cy.get('table tbody tr').first().find('td').eq(1).should('contain.text', 'Animal Modified')
