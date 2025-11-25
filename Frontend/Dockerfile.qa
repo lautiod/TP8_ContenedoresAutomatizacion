@@ -17,7 +17,7 @@ FROM nginx:alpine AS final
 COPY Frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copio el artefacto Angular (Angular 17+ usa /browser)
-COPY --from=build /app/dist/employee-crud-angular/browser /usr/share/nginx/html
+COPY --from=build /app/dist/farm-crud-angular/browser /usr/share/nginx/html
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

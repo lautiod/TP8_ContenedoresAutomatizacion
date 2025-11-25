@@ -59,10 +59,10 @@ namespace FarmCrudApi.Tests
         }
 
         [Fact]
-        public async Task GetAsync_ReturnsAllEmployees()
+        public async Task GetAsync_ReturnsAllAnimals()
         {
             // Arrange
-            var employees = new List<Animal>
+            var animals = new List<Animal>
             {
                 new Animal { Id = "1", Name = "John Doe", CreatedDate = DateTime.UtcNow },
                 new Animal { Id = "2", Name = "Jane Smith", CreatedDate = DateTime.UtcNow }
@@ -74,7 +74,7 @@ namespace FarmCrudApi.Tests
             _mockCursor.SetupSequence(c => c.MoveNextAsync(It.IsAny<CancellationToken>()))
                       .ReturnsAsync(true)
                       .ReturnsAsync(false);
-            _mockCursor.Setup(c => c.Current).Returns(employees);
+            _mockCursor.Setup(c => c.Current).Returns(animals);
 
             _mockCollection.Setup(c => c.FindAsync(
                 It.IsAny<FilterDefinition<Animal>>(),
@@ -95,7 +95,7 @@ namespace FarmCrudApi.Tests
         }
 
         [Fact]
-        public async Task GetAsync_ReturnsEmptyList_WhenNoEmployees()
+        public async Task GetAsync_ReturnsEmptyList_WhenNoAnimals()
         {
             // Arrange
             var emptyList = new List<Animal>();
@@ -120,10 +120,10 @@ namespace FarmCrudApi.Tests
         }
 
         [Fact]
-        public async Task GetAsync_WithId_ReturnsEmployee()
+        public async Task GetAsync_WithId_ReturnsAnimal()
         {
             // Arrange
-            var employee = new Animal { Id = "123", Name = "Test Animal", CreatedDate = DateTime.UtcNow };
+            var animal = new Animal { Id = "123", Name = "Test Animal", CreatedDate = DateTime.UtcNow };
 
             _mockCursor.SetupSequence(c => c.MoveNext(It.IsAny<CancellationToken>()))
                       .Returns(true)
@@ -131,7 +131,7 @@ namespace FarmCrudApi.Tests
             _mockCursor.SetupSequence(c => c.MoveNextAsync(It.IsAny<CancellationToken>()))
                       .ReturnsAsync(true)
                       .ReturnsAsync(false);
-            _mockCursor.Setup(c => c.Current).Returns(new List<Animal> { employee });
+            _mockCursor.Setup(c => c.Current).Returns(new List<Animal> { animal });
 
             _mockCollection.Setup(c => c.FindAsync(
                 It.IsAny<FilterDefinition<Animal>>(),
@@ -174,10 +174,10 @@ namespace FarmCrudApi.Tests
         }
 
         [Fact]
-        public async Task CreateAsync_SetsCreatedDateAndInsertsEmployee()
+        public async Task CreateAsync_SetsCreatedDateAndInsertsAnimal()
         {
             // Arrange
-            var employee = new Animal { Name = "New Animal" };
+            var animal = new Animal { Name = "New Animal" };
             var beforeCreate = DateTime.UtcNow;
 
             _mockCollection.Setup(c => c.InsertOneAsync(
@@ -189,12 +189,12 @@ namespace FarmCrudApi.Tests
             var service = new AnimalService(_mockMongoClient.Object, _mockConfiguration.Object);
 
             // Act
-            await service.CreateAsync(employee);
+            await service.CreateAsync(animal);
             var afterCreate = DateTime.UtcNow;
 
             // Assert
-            Assert.NotEqual(default(DateTime), employee.CreatedDate);
-            Assert.True(employee.CreatedDate >= beforeCreate && employee.CreatedDate <= afterCreate);
+            Assert.NotEqual(default(DateTime), animal.CreatedDate);
+            Assert.True(animal.CreatedDate >= beforeCreate && animal.CreatedDate <= afterCreate);
             
             _mockCollection.Verify(c => c.InsertOneAsync(
                 It.Is<Animal>(e => e.Name == "New Animal" && e.CreatedDate != default(DateTime)),
@@ -203,11 +203,11 @@ namespace FarmCrudApi.Tests
         }
 
         [Fact]
-        public async Task UpdateAsync_ReplacesEmployee()
+        public async Task UpdateAsync_ReplacesAnimal()
         {
             // Arrange
-            var employeeId = "123";
-            var updatedEmployee = new Animal { Id = employeeId, Name = "Updated Name", CreatedDate = DateTime.UtcNow };
+            var animalId = "123";
+            var updatedAnimal = new Animal { Id = animalId, Name = "Updated Name", CreatedDate = DateTime.UtcNow };
 
             var mockReplaceResult = new Mock<ReplaceOneResult>();
             mockReplaceResult.Setup(r => r.IsAcknowledged).Returns(true);
@@ -224,7 +224,7 @@ namespace FarmCrudApi.Tests
             var service = new AnimalService(_mockMongoClient.Object, _mockConfiguration.Object);
 
             // Act
-            await service.UpdateAsync(employeeId, updatedEmployee);
+            await service.UpdateAsync(animalId, updatedAnimal);
 
             // Assert
             _mockCollection.Verify(c => c.ReplaceOneAsync(
@@ -235,10 +235,10 @@ namespace FarmCrudApi.Tests
         }
 
         [Fact]
-        public async Task RemoveAsync_DeletesEmployee()
+        public async Task RemoveAsync_DeletesAnimal()
         {
             // Arrange
-            var employeeId = "123";
+            var animalId = "123";
 
             var mockDeleteResult = new Mock<DeleteResult>();
             mockDeleteResult.Setup(r => r.IsAcknowledged).Returns(true);
@@ -253,7 +253,7 @@ namespace FarmCrudApi.Tests
             var service = new AnimalService(_mockMongoClient.Object, _mockConfiguration.Object);
 
             // Act
-            await service.RemoveAsync(employeeId);
+            await service.RemoveAsync(animalId);
 
             // Assert
             _mockCollection.Verify(c => c.DeleteOneAsync(

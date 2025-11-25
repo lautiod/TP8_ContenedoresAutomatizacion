@@ -16,13 +16,13 @@ namespace FarmCrudApi.Tests
     public async Task GetAll_ReturnsListOfAnimals()
         {
             // Arrange
-            var employees = new List<Animal>
+            var animals = new List<Animal>
             {
                 new Animal { Id = "507f1f77bcf86cd799439011", Name = "John Doe" },
                 new Animal { Id = "507f1f77bcf86cd799439012", Name = "Jane Doe" }
             };
             var mock = new Mock<IAnimalService>();
-            mock.Setup(s => s.GetAsync()).ReturnsAsync(employees);
+            mock.Setup(s => s.GetAsync()).ReturnsAsync(animals);
 
             var controller = new AnimalController(mock.Object);
 
