@@ -248,6 +248,46 @@ jobs:
           echo "✅ QA deployment triggered successfully"
           echo "### 🚀 QA Deployment" >> $GITHUB_STEP_SUMMARY
           echo "[View QA Frontend](https://tp8-front-qa.onrender.com/)" >> $GITHUB_STEP_SUMMARY
+      - name: Wait for QA to be ready
+        run: |
+          echo "Waiting for QA frontend to respond (https://tp8-front-qa.onrender.com)..."
+          for i in {1..24}; do
+            status=$(curl -s -o /dev/null -w "%{http_code}" https://tp8-front-qa.onrender.com || echo "000")
+            if [ "$status" = "200" ]; then
+              echo "QA frontend is up (HTTP 200)";
+              exit 0;
+            fi
+            echo "Attempt $i: status=$status - waiting 5s..."
+            sleep 5
+          done
+          echo "QA frontend did not become ready in time";
+          exit 1
+
+      - name: Setup Node for Cypress
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies (for Cypress)
+        working-directory: Frontend
+        run: |
+          npm ci || npm install
+
+      - name: Run Cypress integration tests against QA
+        working-directory: Frontend
+        env:
+          CYPRESS_baseUrl: https://tp8-front-qa.onrender.com
+        run: |
+          mkdir -p test-results
+          npx cypress run --config baseUrl=https://tp8-front-qa.onrender.com --reporter junit --reporter-options "mochaFile=./test-results/cypress-results.xml"
+
+      - name: Publish Cypress Integration Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: 'Frontend/test-results/cypress-results.xml'
+          check_name: 'Cypress Integration Tests (QA)'
+          search_pull_requests: false
 
   deploy_prod:
     name: Deploy to Production
