@@ -1,39 +1,52 @@
 describe('editAnimalTest', () => {
   it('Edita correctamente un animal', () => {
     // Interceptar las peticiones relevantes para sincronizar el test
-    // Match update endpoint regardless of HTTP verb to be more robust
-    cy.intercept('**/api/Animal/update*').as('updateAnimal')
+    cy.intercept('POST', '**/api/Animal/create').as('createAnimal')
+    cy.intercept('PUT', '**/api/Animal/update*').as('updateAnimal')
     cy.intercept('GET', '**/api/Animal/getall').as('getAll')
+    cy.intercept('GET', '**/api/Animal/*').as('getAnimalById')
 
-    // Visitar y esperar a que la lista se cargue
+    // Visitar la aplicación
     cy.visit('https://tp8-front-qa.onrender.com') // URL del front
-    cy.wait('@getAll')
+    cy.wait('@getAll', { timeout: 10000 })
 
-    // Asegurarse de que hay al menos una fila en la tabla
-    cy.get('table tbody tr').should('have.length.gte', 1)
+    // Crear un animal primero para asegurar que hay datos para editar
+    cy.get('button.float-right', { timeout: 10000 }).should('be.visible').click()
+    cy.get('input[name="name"]', { timeout: 10000 }).should('be.visible').clear().type('Animal Test Cypress')
+    cy.get('button[type="submit"]').should('contain', 'Create').click()
+    cy.wait('@createAnimal', { timeout: 10000 })
+    cy.wait('@getAll', { timeout: 10000 })
 
-    // Haz clic en el icono de editar dentro de la primera fila (selector más tolerante)
-    cy.get('table tbody tr').first().within(() => {
-      cy.get('i.fa').first().click()
+    // Asegurarse de que la tabla está visible y tiene al menos una fila
+    cy.get('table tbody tr', { timeout: 10000 }).should('be.visible').should('have.length.gte', 1)
+
+    // Haz clic en el icono de editar dentro de la primera fila
+    cy.get('table tbody tr', { timeout: 10000 }).first().within(() => {
+      cy.get('i.fa-edit', { timeout: 5000 }).should('be.visible').click()
     })
 
-    // Asegúrate de que el campo de texto esté visible y habilitado,
-    // luego lo limpiamos y escribimos el nuevo nombre
-    cy.get('.form-control')
+    // Esperar a que cargue el animal en el formulario de edición
+    cy.wait('@getAnimalById', { timeout: 10000 })
+
+    // Asegurarse de que estamos en el modo edición verificando el texto del botón
+    cy.get('button[type="submit"]', { timeout: 10000 }).should('contain', 'Edit')
+
+    // Modificar el nombre del animal
+    cy.get('input[name="name"]', { timeout: 10000 })
       .should('be.visible')
       .should('not.be.disabled')
+      .should('have.value', 'Animal Test Cypress') // Verificar que se cargó correctamente
       .clear()
-      .type('Animal Modified')
+      .type('Animal Modified Cypress')
 
-    // Envía el formulario
-    cy.get('.btn').click()
+    // Envía el formulario de edición
+    cy.get('button[type="submit"]').should('contain', 'Edit').click()
 
-    // Espera a que la recarga de la lista termine. Evitamos depender exclusivamente
-    // de la petición `updateAnimal` (algunas implementaciones pueden usar otro verb).
-    // Aumentamos el timeout para entornos que tardan más en procesar.
+    // Espera la actualización y recarga
+    cy.wait('@updateAnimal', { timeout: 10000 })
     cy.wait('@getAll', { timeout: 20000 })
 
-    // Verificación más robusta: usa contain.text sobre la celda de nombre
-    cy.get('table tbody tr').first().find('td').eq(1).should('contain.text', 'Animal Modified')
+    // Verificación: el animal debe estar actualizado
+    cy.get('table tbody tr', { timeout: 10000 }).first().find('td').eq(1).should('contain.text', 'Animal Modified Cypress')
   })
 })
