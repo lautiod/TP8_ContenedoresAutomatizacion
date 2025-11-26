@@ -23,10 +23,7 @@ COPY --from=build /app/dist/farm-crud-angular/browser /usr/share/nginx/html
 RUN rm -f /usr/share/nginx/html/assets/config.json
 
 # Copio el script de generación de config
-COPY Frontend/generate-config.sh /docker-entrypoint.d/generate-config.sh
-RUN chmod +x /docker-entrypoint.d/generate-config.sh
+COPY Frontend/generate-config.sh /docker-entrypoint.d/40-generate-config.sh
+RUN chmod +x /docker-entrypoint.d/40-generate-config.sh
 
 EXPOSE 80
-
-# Usar el script como entrypoint para generar config.json en runtime
-ENTRYPOINT ["/docker-entrypoint.d/generate-config.sh"]

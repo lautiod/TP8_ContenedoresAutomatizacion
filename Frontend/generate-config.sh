@@ -21,6 +21,3 @@ echo "Configuration file generated at $CONFIG_FILE"
 echo "  API_URL=$API_URL"
 echo "  ENV_NAME=$ENV_NAME"
 echo "  DB_NAME=$DB_NAME"
-
-# Iniciar nginx
-nginx -g 'daemon off;'
