@@ -338,3 +338,8 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+# Cypress test results
+cypress/results/
+cypress/screenshots/
+cypress/videos/

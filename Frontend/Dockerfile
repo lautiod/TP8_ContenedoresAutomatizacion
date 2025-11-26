@@ -19,6 +19,9 @@ COPY Frontend/nginx.conf /etc/nginx/conf.d/default.conf
 # Copio el artefacto Angular (Angular 17+ usa /browser)
 COPY --from=build /app/dist/farm-crud-angular/browser /usr/share/nginx/html
 
+# Eliminar el config.json del build para que se genere en runtime
+RUN rm -f /usr/share/nginx/html/assets/config.json
+
 # Copio el script de generación de config
 COPY Frontend/generate-config.sh /docker-entrypoint.d/generate-config.sh
 RUN chmod +x /docker-entrypoint.d/generate-config.sh
