@@ -19,7 +19,7 @@ env:
 
 jobs:
   sonarcloud:
-    name: SonarCloud Analysis
+    name: Unit Tests & SonarCloud Analysis
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -113,47 +113,9 @@ jobs:
           echo "### SonarCloud Analysis" >> $GITHUB_STEP_SUMMARY
           echo "[View Full Report](https://sonarcloud.io/summary/overall?id=lautiod_TP8_ContenedoresAutomatizacion&branch=main)" >> $GITHUB_STEP_SUMMARY
 
-  build:
-    name: Build Validation
-    needs: sonarcloud
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      # ---------- Backend Build ----------
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-
-      - name: Restore backend
-        run: dotnet restore Backend/Backend/AnimalCrudApi.csproj
-
-      - name: Build backend
-        run: dotnet build Backend/Backend/AnimalCrudApi.csproj -c Release --no-restore
-
-      # ---------- Frontend Build ----------
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install frontend dependencies
-        working-directory: Frontend
-        run: npm ci || npm install
-
-      - name: Build frontend (QA)
-        working-directory: Frontend
-        run: npx ng build --configuration qa
-
-      - name: Build frontend (Production)
-        working-directory: Frontend
-        run: npx ng build --configuration production
-
   build_and_push_images:
     name: Build & Push Docker Images
-    needs: build
+    needs: sonarcloud
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
