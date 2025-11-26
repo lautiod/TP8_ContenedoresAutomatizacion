@@ -151,8 +151,8 @@ jobs:
         working-directory: Frontend
         run: npx ng build --configuration production
 
-  build_push_qa:
-    name: Build & Push QA Images
+  build_and_push_images:
+    name: Build & Push Docker Images
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -166,68 +166,35 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & Push Backend QA
+      - name: Build & Push Backend
         uses: docker/build-push-action@v6
         with:
           context: .
           file: Backend/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_BACK }}:qa
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_BACK }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_BACK }}:latest
           labels: |
             org.opencontainers.image.source=${{ github.event.repository.html_url }}
             org.opencontainers.image.revision=${{ github.sha }}
 
-      - name: Build & Push Frontend QA
+      - name: Build & Push Frontend
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Frontend/Dockerfile.qa
+          file: Frontend/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_FRONT }}:qa
-          labels: |
-            org.opencontainers.image.source=${{ github.event.repository.html_url }}
-            org.opencontainers.image.revision=${{ github.sha }}
-
-  build_push_prod:
-    name: Build & Push Production Images
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build & Push Backend PROD
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Backend/Dockerfile
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_BACK }}:prod
-          labels: |
-            org.opencontainers.image.source=${{ github.event.repository.html_url }}
-            org.opencontainers.image.revision=${{ github.sha }}
-
-      - name: Build & Push Frontend PROD
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Frontend/Dockerfile.prod
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_FRONT }}:prod
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_FRONT }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_FRONT }}:latest
           labels: |
             org.opencontainers.image.source=${{ github.event.repository.html_url }}
             org.opencontainers.image.revision=${{ github.sha }}
 
   deploy_qa:
     name: Deploy to QA
-    needs: build_push_qa
+    needs: build_and_push_images
     runs-on: ubuntu-latest
     environment:
       name: qa
@@ -294,7 +261,7 @@ jobs:
 
   deploy_prod:
     name: Deploy to Production
-    needs: [build_push_prod]
+    needs: [deploy_qa]
     runs-on: ubuntu-latest
     environment:
       name: production

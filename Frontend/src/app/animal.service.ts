@@ -4,15 +4,21 @@ import { Observable } from 'rxjs';
 import { Animal } from './animal.model';
 import { map } from 'rxjs/operators';
 import { DatePipe } from '@angular/common';
-import { environment } from '../environments/environment';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AnimalService {
-  apiUrlAnimal = environment.apiUrl;
+  get apiUrlAnimal(): string {
+    return this.configService.getApiUrl();
+  }
 
-  constructor(private http: HttpClient, private datepipe: DatePipe) {}
+  constructor(
+    private http: HttpClient, 
+    private datepipe: DatePipe,
+    private configService: ConfigService
+  ) {}
 
   getAllAnimals(): Observable<Animal[]> {
     return this.http
