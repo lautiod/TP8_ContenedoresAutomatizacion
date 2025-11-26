@@ -1,3 +1,5 @@
 {
-  "apiUrl": "http://localhost:7150"
+  "apiUrl": "http://localhost:7150",
+  "envName": "DEV",
+  "dbName": "ISW_DB_DEV"
 }

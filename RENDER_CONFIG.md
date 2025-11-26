@@ -12,6 +12,8 @@ En la sección "Environment", agregar:
 
 ```
 API_URL=https://tp8-api-qa.onrender.com/api/Animal
+ENV_NAME=QA
+DB_NAME=ISW_DB_QA
 ```
 
 ### Frontend PROD (tp8-front-prod)
@@ -20,6 +22,8 @@ En la sección "Environment", agregar:
 
 ```
 API_URL=https://tp8-api-prod.onrender.com/api/Animal
+ENV_NAME=PROD
+DB_NAME=ISW_DB_PROD
 ```
 
 ### Backend QA y PROD

@@ -20,10 +20,12 @@ describe('editAnimalTest', () => {
     // Asegurarse de que la tabla está visible y tiene al menos una fila
     cy.get('table tbody tr', { timeout: 10000 }).should('be.visible').should('have.length.gte', 1)
 
-    // Haz clic en el icono de editar dentro de la primera fila
-    cy.get('table tbody tr', { timeout: 10000 }).first().within(() => {
-      cy.get('i.fa-edit', { timeout: 5000 }).should('be.visible').click()
-    })
+    // Buscar la fila que contiene "Animal Test Cypress" y hacer clic en editar
+    cy.contains('table tbody tr', 'Animal Test Cypress', { timeout: 10000 })
+      .should('be.visible')
+      .within(() => {
+        cy.get('i.fa-edit', { timeout: 5000 }).should('be.visible').click()
+      })
 
     // Esperar a que cargue el animal en el formulario de edición
     cy.wait('@getAnimalById', { timeout: 10000 })
@@ -46,7 +48,9 @@ describe('editAnimalTest', () => {
     cy.wait('@updateAnimal', { timeout: 10000 })
     cy.wait('@getAll', { timeout: 20000 })
 
-    // Verificación: el animal debe estar actualizado
-    cy.get('table tbody tr', { timeout: 10000 }).first().find('td').eq(1).should('contain.text', 'Animal Modified Cypress')
+    // Verificación: buscar el animal actualizado en la tabla
+    cy.contains('table tbody tr', 'Animal Modified Cypress', { timeout: 10000 })
+      .should('be.visible')
+      .find('td').eq(1).should('contain.text', 'Animal Modified Cypress')
   })
 })

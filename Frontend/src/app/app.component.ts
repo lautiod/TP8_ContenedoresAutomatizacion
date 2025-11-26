@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { environment } from '../environments/environment';
 import { CommonModule } from '@angular/common';
+import { ConfigService } from './config.service';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +12,14 @@ import { CommonModule } from '@angular/common';
 })
 export class AppComponent {
   title = 'Farm Animals Management';
-  envName = environment.envName;
-  dbName = environment.dbName;
+  
+  get envName(): string {
+    return this.configService.getEnvName();
+  }
+  
+  get dbName(): string {
+    return this.configService.getDbName();
+  }
+
+  constructor(private configService: ConfigService) {}
 }
