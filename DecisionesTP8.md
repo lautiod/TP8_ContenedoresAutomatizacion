@@ -1,4 +1,8 @@
-## 1. Decisiones TP8 
+# Decisiones TP8 
+
+---
+
+## 1. Arquitectura utilizada
 
 ### 1.1 Stack tecnológico elegido y justificación
 Para el desarrollo del proyecto se utilizó un stack mixto compuesto por:
