@@ -76,7 +76,7 @@ jobs:
           check_name: 'Frontend Test Results'
           search_pull_requests: false
 
-      ###############################################
+      ################################################
       ## ---------- SonarCloud Analysis ---------- ##
       ###############################################
       - name: SonarCloud Scan
