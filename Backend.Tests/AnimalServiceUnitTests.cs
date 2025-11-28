@@ -90,7 +90,9 @@ namespace FarmCrudApi.Tests
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
-            Assert.Equal("John Doe", result[0].Name);
+            // Assert.Equal("John Doe", result[0].Name);
+            // Cambio de nombre para probar que los tests fallan si los datos son incorrectos
+            Assert.Equal("Nombre Equivocado", result[0].Name);
             Assert.Equal("Jane Smith", result[1].Name);
         }
 
