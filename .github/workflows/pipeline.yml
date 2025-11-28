@@ -26,8 +26,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for better analysis
-
-      # ---------- Backend Setup & Tests ----------
+      
+      #################################################
+      ## ---------- BACKEND Setup & Tests ---------- ##
+      #################################################
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -50,8 +52,9 @@ jobs:
           check_name: 'Backend Test Results'
           search_pull_requests: false
 
-
-      # ---------- Frontend Setup & Tests ----------
+      ##################################################
+      ## ---------- FRONTEND Setup & Tests ---------- ##
+      ################################################## 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -73,7 +76,9 @@ jobs:
           check_name: 'Frontend Test Results'
           search_pull_requests: false
 
-      # ---------- SonarCloud Analysis ----------
+      ###############################################
+      ## ---------- SonarCloud Analysis ---------- ##
+      ###############################################
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -128,6 +133,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      #########################################
+      ## ---------- BACKEND Image ---------- ##
+      ######################################### 
       - name: Build & Push Backend
         uses: docker/build-push-action@v6
         with:
@@ -141,6 +149,9 @@ jobs:
             org.opencontainers.image.source=${{ github.event.repository.html_url }}
             org.opencontainers.image.revision=${{ github.sha }}
 
+      ##########################################
+      ## ---------- FRONTEND Image ---------- ##
+      ##########################################
       - name: Build & Push Frontend
         uses: docker/build-push-action@v6
         with:
@@ -165,6 +176,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      ########################################
+      ## ---------- DEPLOY to QA ---------- ##
+      ########################################
       - name: Deploy Backend QA to Render
         run: |
           echo "Deploying backend to QA..."
@@ -195,6 +209,9 @@ jobs:
           echo "QA frontend did not become ready in time";
           exit 1
 
+      #####################################################
+      ## ---------- CYPRESS Integration Tests ---------- ##
+      #####################################################
       - name: Setup Node for Cypress
         uses: actions/setup-node@v4
         with:
@@ -228,6 +245,10 @@ jobs:
     environment:
       name: production
       url: https://tp8-front-prod.onrender.com
+    
+    ##########################################
+    ## ---------- DEPLOY to PROD ---------- ##
+    ##########################################
     steps:
       - name: Deploy Backend PROD to Render
         run: |
