@@ -39,5 +39,5 @@ El pipeline automatiza el proceso completo de integración y despliegue:
 
 - **Tests Unitarios**: Backend (xUnit) y Frontend (Jasmine/Karma)
 - **Tests de Integración**: Cypress ejecutados automáticamente en QA
-- **Cobertura de Código**: Reportada a SonarCloud.
+- **Cobertura de Código**: Reportada a SonarCloud
 
