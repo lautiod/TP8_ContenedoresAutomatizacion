@@ -92,7 +92,7 @@ namespace FarmCrudApi.Tests
             Assert.Equal(2, result.Count);
             // Assert.Equal("Nombre Equivocado", result[0].Name);
             // Reemplazado con el nombre correcto
-            Assert.Equal("John Doe", result[0].Name);
+            Assert.Equal("Nombre Incorrecto (fallo provocado voluntariamente)", result[0].Name);
             Assert.Equal("Jane Smith", result[1].Name);
         }
 
