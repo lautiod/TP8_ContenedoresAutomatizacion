@@ -1,6 +1,6 @@
 # TP Integrador ISW /
 
-Trabajo Práctico Integrador que comprende los contenidos vistos en la materia **Ingeniería de Software 3** 
+Trabajo Práctico Integrador que comprende los contenidos vistos en la materia **Ingeniería de Software 3.** 
 
 ## 👥 Alumnos (Cat: A2)
 
