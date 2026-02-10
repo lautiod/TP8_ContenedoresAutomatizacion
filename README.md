@@ -32,7 +32,7 @@ El pipeline automatiza el proceso completo de integración y despliegue:
 2. **Tests Unitarios** → Backend (.NET) + Frontend (Angular/Karma)
 3. **Build & Push** → Construcción de imágenes Docker unificadas con tags `:latest` y `:${SHA}`
 4. **Deploy QA** → Despliegue automático + Tests de integración (Cypress)
-5. **Deploy PROD** → Despliegue con aprobación manual
+5. **Deploy PROD** → Despliegue con aprobación manual.
 
 
 ### 🧪 Testing
